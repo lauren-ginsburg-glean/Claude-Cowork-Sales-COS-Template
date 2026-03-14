@@ -2,71 +2,47 @@
 
 > Lauren's active deals at a glance. For full deal detail, see `accounts/[company-name].md`.
 
-**Last updated:** [Date]
-**Quarter:** Q[X] [Year]
-**Quarterly target:** $[X]
-**Closed this quarter:** $[X]
-**Pipeline total:** $[X]
+**Last updated:** March 14, 2026
+**Quarter:** Q1 2026
+**Quarterly target:** $388k
+**Closed this quarter:** $[X] — update regularly
+**Pipeline total:** $850k+ (add remaining deals)
 
 ---
 
 ## Pipeline Summary
 
-| Company | Stage | ARR | Close Date | Champion | Economic Buyer | MEDDPICC Score | Next Action |
-|---------|-------|-----|------------|----------|----------------|----------------|-------------|
-| [Company A] | [Stage] | $[X]k | [MM/DD] | [Name / Title] | [Name / Title] | [🟢 Strong / 🟡 Developing / 🔴 Weak] | [Next action] |
-| [Company B] | [Stage] | $[X]k | [MM/DD] | [Name / Title] | [Name / Title] | [🟢/🟡/🔴] | [Next action] |
-| [Company C] | [Stage] | $[X]k | [MM/DD] | [Name / Title] | [Name / Title] | [🟢/🟡/🔴] | [Next action] |
+| Company | Stage | ARR | Close Date | Champion(s) | Economic Buyer | MEDDPICC Score | Next Action |
+|---------|-------|-----|------------|-------------|----------------|----------------|-------------|
+| Amplify Education | Stage 7 — Procurement | $850k | March 31, 2026 | Aaron Harnly (CTO), Rick McMorrow (CIO), Kevin Keogan (SVP IT), Sarah Barnes (VP L&D) | Catherine Mackay (President) | 🟡 Developing | Secure Catherine's approval + advance legal/procurement |
 
 ---
 
 ## Deal Detail
 
-> Quick-reference view of each deal. Update after every meaningful interaction.
-
 ---
 
-### [Company A]
-**Stage:** [e.g., Technical Validation / POV / Negotiation]
-**ARR:** $[X]k
-**Close Date:** [MM/DD/YY]
-**Account file:** `accounts/[company-a].md`
+### Amplify Education
+**Stage:** 7 — Procurement
+**ARR:** $850k
+**Close Date:** March 31, 2026 ⚠️ 17 days away
+**Account file:** `accounts/amplify-education.md`
 
 | MEDDPICC | Status | Notes |
 |----------|--------|-------|
-| **Metrics** | 🟢 / 🟡 / 🔴 | [e.g., Quantified ROI built — $Xm saved/yr] |
-| **Economic Buyer** | 🟢 / 🟡 / 🔴 | [e.g., Identified as [Name/Title] — not yet met] |
-| **Decision Criteria** | 🟢 / 🟡 / 🔴 | [e.g., Security and search quality — confirmed] |
-| **Decision Process** | 🟢 / 🟡 / 🔴 | [e.g., Procurement + legal + IT sign-off needed] |
-| **Identify Pain** | 🟢 / 🟡 / 🔴 | [e.g., Engineers spending 4hrs/wk searching — confirmed] |
-| **Champion** | 🟢 / 🟡 / 🔴 | [e.g., [Name] is engaged but needs coaching on EB access] |
-| **Competition** | 🟢 / 🟡 / 🔴 | [e.g., vs. Microsoft Copilot — we're winning on connector breadth] |
+| **Metrics** | 🟢/🟡/🔴 | [Quantified ROI — add if built] |
+| **Economic Buyer** | 🟡 Developing | Catherine Mackay, President — final approval needed, not yet secured |
+| **Decision Criteria** | 🟢/🟡/🔴 | [What Amplify is evaluating on] |
+| **Decision Process** | 🟢 | In legal/procurement now — initial rollout of 4,000 users |
+| **Identify Pain** | 🟢/🟡/🔴 | [Core business pain driving this deal] |
+| **Champion** | 🟢 Strong | Strong champion team — Aaron Harnly (CTO), Rick McMorrow (CIO), Kevin Keogan (SVP IT), Sarah Barnes (VP L&D) |
+| **Competition** | 🟢/🟡/🔴 | [Competitors in play if any] |
 
-**Where we are:** [1-2 sentence summary of deal status]
-**Key risk:** [What could kill this deal]
-**Next action:** [Specific next step + owner + date]
+**Where we are:** Working to secure final approval from Catherine Mackay (President) for an initial rollout of 4,000 users. Legal/procurement process has begun.
 
----
+**Key risk:** Catherine could shut down or materially scale back the deal — reducing the 4,000-user initial rollout. She has not yet given final approval.
 
-### [Company B]
-**Stage:** [Stage]
-**ARR:** $[X]k
-**Close Date:** [MM/DD/YY]
-**Account file:** `accounts/[company-b].md`
-
-| MEDDPICC | Status | Notes |
-|----------|--------|-------|
-| **Metrics** | 🟢 / 🟡 / 🔴 | |
-| **Economic Buyer** | 🟢 / 🟡 / 🔴 | |
-| **Decision Criteria** | 🟢 / 🟡 / 🔴 | |
-| **Decision Process** | 🟢 / 🟡 / 🔴 | |
-| **Identify Pain** | 🟢 / 🟡 / 🔴 | |
-| **Champion** | 🟢 / 🟡 / 🔴 | |
-| **Competition** | 🟢 / 🟡 / 🔴 | |
-
-**Where we are:**
-**Key risk:**
-**Next action:**
+**Recommended next action:** Equip champions (Aaron, Rick, Kevin, Sarah) to present a compelling internal business case to Catherine. Understand what Catherine cares about most and make sure the framing speaks directly to her priorities as President.
 
 ---
 
@@ -74,8 +50,7 @@
 
 | Company | Why Interesting | Outreach Status | Next Touch |
 |---------|----------------|-----------------|------------|
-| [Company] | [e.g., CTO inbound from event] | [e.g., 1st meeting scheduled] | [Date] |
-| [Company] | [e.g., SDR sequence active] | [e.g., Day 5 of sequence] | [Date] |
+| [Add] | | | |
 
 ---
 
@@ -83,7 +58,7 @@
 
 | Company | ARR | Close Date | Notes |
 |---------|-----|------------|-------|
-| [Company] | $[X]k | [Date] | [e.g., Key win — first [vertical] logo] |
+| [Add] | | | |
 
 ---
 
@@ -91,14 +66,14 @@
 
 | Company | ARR | Lost To | Why We Lost | Learning |
 |---------|-----|---------|-------------|---------|
-| [Company] | $[X]k | [Competitor / No decision] | [Why] | [What to do differently] |
+| [Add] | | | | |
 
 ---
 
 ## Notes for Claude
 
 When reading this file, always:
-1. Flag any deal where close date is within 30 days and MEDDPICC has red items
+1. Flag any deal where close date is within 30 days and MEDDPICC has red or yellow items — **Amplify Education closes March 31 and EB approval is not yet secured**
 2. Note deals that haven't had a next action updated recently (potential stall)
-3. Surface deals where Economic Buyer or Champion is weak — these are highest risk
-4. Calculate total pipeline vs. quarterly target and flag if coverage is below [X]x
+3. Surface deals where Economic Buyer or Champion is weak — highest risk
+4. Calculate total pipeline vs. $388k quarterly target and flag coverage gaps
