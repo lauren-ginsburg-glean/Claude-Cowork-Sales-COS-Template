@@ -1,15 +1,13 @@
-# Lauren's Personal OS for Claude Cowork
-> A sales-first second brain and personal operating system built for Glean AEs.
+# Sales Personal OS for Claude Cowork
+> A sales-first second brain and personal operating system for AEs.
 
-Inspired by [colin-atlas/claude-personal-os](https://github.com/colin-atlas/claude-personal-os), rebuilt from scratch for a sales workflow centered on pipeline, prospects, and MEDDPICC.
+A personal operating system that turns Claude Cowork into your AI sales partner — one that knows your deals, your company, your style, and your goals.
 
 ---
 
 ## What This Is
 
-This repo is your **personal operating system** for Claude Cowork. It turns Claude into your AI sales partner — one that knows your deals, your company, your style, and your goals.
-
-Every time you open Cowork and point it at this folder, Claude loads your context and is ready to:
+This repo is your **personal operating system** for Claude Cowork. Every time you open Cowork and point it at this folder, Claude loads your context and is ready to:
 - Start your day with a prioritized sales briefing
 - Prep you for any meeting (especially external / prospect calls)
 - Write prospect-facing recap emails after meetings
@@ -21,10 +19,8 @@ Every time you open Cowork and point it at this folder, Claude loads your contex
 
 ## Quick Start
 
-### 1. Clone or download this repo
-```bash
-git clone https://github.com/YOUR-USERNAME/lauren-personal-os.git
-```
+### 1. Use this template
+Click **Use this template** to create your own private copy of this repo.
 
 ### 2. Fill in your second-brain files
 These are the files Claude reads to understand your world. Complete them once, update as things change.
@@ -32,7 +28,7 @@ These are the files Claude reads to understand your world. Complete them once, u
 | File | What to fill in |
 |------|----------------|
 | `second-brain/profile.md` | Your quota, goals, work style, zone of genius |
-| `second-brain/company.md` | Glean's pitch, ICP, value props (pre-filled with a starter) |
+| `second-brain/company.md` | Your company's pitch, ICP, value props |
 | `second-brain/team.md` | Your SE, SDR, manager, CS partner, etc. |
 | `second-brain/projects.md` | Non-deal work you're tracking |
 | `second-brain/deals.md` | Your active pipeline |
@@ -62,7 +58,7 @@ From here, just talk to Claude using the trigger phrases below.
 ## Folder Structure
 
 ```
-lauren-personal-os/
+your-personal-os/
 ├── CLAUDE.md                    ← Main instructions for Claude
 ├── README.md                    ← This file
 ├── schedule.md                  ← Your weekly meeting rhythms
@@ -78,7 +74,7 @@ lauren-personal-os/
 │   ├── TEMPLATE-account.md
 │   └── [company-name].md
 │
-├── skills/                      ← Claude's workflow scripts (don't edit unless customizing)
+├── skills/                      ← Claude's workflow scripts
 │   ├── prep-my-day.md
 │   ├── meeting-prep.md
 │   ├── meeting-recap.md
@@ -114,7 +110,3 @@ To add a new workflow:
 1. Create a new file in `skills/` (e.g., `skills/qbr-prep.md`)
 2. Add the trigger phrase and file path to `CLAUDE.md`
 3. Write the step-by-step workflow script
-
----
-
-*Built for Lauren Ginsburg | Glean AE | Powered by Claude Cowork*
