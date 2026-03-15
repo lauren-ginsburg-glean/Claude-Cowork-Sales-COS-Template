@@ -14,7 +14,7 @@
 
 | Company | Stage | ARR | Close Date | Champion(s) | Economic Buyer | MEDDPICC Score | Next Action |
 |---------|-------|-----|------------|-------------|----------------|----------------|-------------|
-| Amplify Education | Stage 7 — Procurement | $850k | March 31, 2026 | Aaron Harnly (CTO), Rick McMorrow (CIO), Kevin Keogan (SVP IT), Sarah Barnes (VP L&D) | Catherine Mackay (President) | 🟡 Developing | Secure Catherine's approval + advance legal/procurement |
+| Amplify Education | Stage 7 — Procurement | $850k | March 31, 2026 | Rick McMorrow (CIO, primary) | Catherine Mackay (President) | 🟡 Developing | **CRITICAL:** Get business case + ROI formally in front of Catherine by March 17; Rick presents by March 18. EB approval is the gate. Map legal/procurement timeline. Brief Kara: Best Case, not Commit. |
 
 ---
 
@@ -30,19 +30,28 @@
 
 | MEDDPICC | Status | Notes |
 |----------|--------|-------|
-| **Metrics** | 🟢/🟡/🔴 | [Quantified ROI — add if built] |
-| **Economic Buyer** | 🟡 Developing | Catherine Mackay, President — final approval needed, not yet secured |
-| **Decision Criteria** | 🟢/🟡/🔴 | [What Amplify is evaluating on] |
-| **Decision Process** | 🟢 | In legal/procurement now — initial rollout of 4,000 users |
-| **Identify Pain** | 🟢/🟡/🔴 | [Core business pain driving this deal] |
-| **Champion** | 🟢 Strong | Strong champion team — Aaron Harnly (CTO), Rick McMorrow (CIO), Kevin Keogan (SVP IT), Sarah Barnes (VP L&D) |
-| **Competition** | 🟢/🟡/🔴 | [Competitors in play if any] |
+| **Metrics** | 🟡 Developing | ROI model built. Need to confirm Catherine has seen it and it speaks to her cost/ROI lens. |
+| **Economic Buyer** | 🔴 Weak | Catherine Mackay, President — met her in exec meeting (Arvind + Catherine + CTO/CIO/SVP IT) but final approval not yet secured. Business case not yet submitted. |
+| **Decision Criteria** | 🟢 Strong | Technical evaluation won. Catherine focused on cost/ROI. |
+| **Decision Process** | 🟡 Developing | Tech eval ✅ → Business case to Catherine (pending) → Approval → Legal/procurement → Signature. 17 days left. |
+| **Identify Pain** | 🟢 Strong | Must double support headcount without Glean. Compelling event: live before June peak season. Clear urgency. |
+| **Champion** | 🟢 Strong | Rick McMorrow (CIO, primary), Aaron Harnly (CTO), Kevin Keogan (SVP IT), Sarah Barnes (VP L&D). Strong team but business case delivery overdue. |
+| **Competition** | 🟢 Strong | No external vendor. Build internally low risk (NVIDIA story). Status quo medium risk. |
 
-**Where we are:** Working to secure final approval from Catherine Mackay (President) for an initial rollout of 4,000 users. Legal/procurement process has begun.
+**Where we are:** Technical evaluation won. EB (Catherine Mackay, President) not yet formally approved. Business case + ROI model exist but **NOT YET FORMALLY SUBMITTED to Catherine for sign-off.** Legal/procurement waiting on Catherine's greenlight.
 
-**Key risk:** Catherine could shut down or materially scale back the deal — reducing the 4,000-user initial rollout. She has not yet given final approval.
+**Key risk:** EB approval is NOT YET SECURED. This is the gate. 17 days to close is tight once Catherine approves.
 
-**Recommended next action:** Equip champions (Aaron, Rick, Kevin, Sarah) to present a compelling internal business case to Catherine. Understand what Catherine cares about most and make sure the framing speaks directly to her priorities as President.
+**Compelling event:** Glean must be live before June peak season — every week of delay compresses deployment timeline.
+
+**FORECAST RECOMMENDATION:** Best Case, NOT Commit. Contingent on Catherine formally approving ROI this week and legal/procurement closing by March 31.
+
+**Immediate next actions (this week):**
+1. Finalize ROI one-pager in Catherine's language (cost avoidance, not features)
+2. Get it to Rick by March 17; ask him to present to Catherine by March 18
+3. Map exact legal/procurement timeline post-approval
+4. Brief Kara: EB approval is the gate; deal is Best Case
+5. Activate Joe Colliss (Legal) early for procurement prep
 
 ---
 

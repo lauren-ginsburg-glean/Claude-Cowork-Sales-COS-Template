@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "deal-strategy", "runs": [{"id": "eval-1-amplify-close-urgency-with_skill", "prompt": "deal strategy for Amplify \u2014 close date is in 17 days and I need to figure out if this is really going to close", "eval_id": 1, "outputs": [{"name": "amplify-education-deal-strategy.html", "type": "text", "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Amplify Education \u2014 Deal Strategy One-Pager</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;\n            background: #f5f5f5;\n            padding: 20px;\n        }\n\n        .container {\n            max-width: 900px;\n            margin: 0 auto;\n            background: white;\n            box-shadow: 0 2px 8px rgba(0,0,0,0.1);\n        }\n\n        .header {\n            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);\n            color: white;\n            padding: 30px;\n            border-bottom: 4px solid #f39c12;\n        }\n\n        .header-top {\n            display: flex;\n            justify-content: space-between;\n            align-items: flex-start;\n            margin-bottom: 20px;\n        }\n\n        .company-name {\n            font-size: 32px;\n            font-weight: 700;\n            margin-bottom: 8px;\n        }\n\n        .company-subtitle {\n            font-size: 14px;\n            opacity: 0.9;\n            margin-bottom: 12px;\n        }\n\n        .header-metrics {\n            display: flex;\n            gap: 30px;\n            font-size: 14px;\n        }\n\n        .metric {\n            display: flex;\n            flex-direction: column;\n        }\n\n        .metric-label {\n            opacity: 0.8;\n            font-size: 12px;\n            text-transform: uppercase;\n            letter-spacing: 0.5px;\n            margin-bottom: 4px;\n        }\n\n        .metric-value {\n            font-size: 18px;\n            font-weight: 600;\n        }\n\n        .health-badge {\n            display: flex;\n            align-items: center;\n            gap: 10px;\n            font-weight: 600;\n            padding: 8px 16px;\n            background: rgba(255,255,255,0.15);\n            border-radius: 6px;\n            width: fit-content;\n        }\n\n        .health-indicator {\n            width: 16px;\n            height: 16px;\n            border-radius: 50%;\n            background: #f39c12;\n        }\n\n        .health-indicator.at-risk {\n            background: #f39c12;\n        }\n\n        .content {\n            padding: 30px;\n        }\n\n        .section {\n            margin-bottom: 30px;\n        }\n\n        .section-title {\n            font-size: 16px;\n            font-weight: 700;\n            text-transform: uppercase;\n            letter-spacing: 0.5px;\n            color: #1a1a2e;\n            margin-bottom: 15px;\n            padding-bottom: 10px;\n            border-bottom: 2px solid #ecf0f1;\n        }\n\n        .meddpicc-grid {\n            display: grid;\n            grid-template-columns: repeat(2, 1fr);\n            gap: 15px;\n            margin-bottom: 20px;\n        }\n\n        .meddpicc-item {\n            padding: 15px;\n            border: 1px solid #ecf0f1;\n            border-radius: 6px;\n            background: #f9f9f9;\n        }\n\n        .meddpicc-item.strong {\n            border-left: 4px solid #27ae60;\n            background: #f0fdf4;\n        }\n\n        .meddpicc-item.developing {\n            border-left: 4px solid #f39c12;\n            background: #fffbf0;\n        }\n\n        .meddpicc-item.weak {\n            border-left: 4px solid #e74c3c;\n            background: #fdf5f5;\n        }\n\n        .meddpicc-label {\n            display: flex;\n            align-items: center;\n            gap: 8px;\n            font-weight: 600;\n            margin-bottom: 8px;\n            font-size: 14px;\n        }\n\n        .status-dot {\n            width: 12px;\n            height: 12px;\n            border-radius: 50%;\n            flex-shrink: 0;\n        }\n\n        .status-dot.strong {\n            background: #27ae60;\n        }\n\n        .status-dot.developing {\n            background: #f39c12;\n        }\n\n        .status-dot.weak {\n            background: #e74c3c;\n        }\n\n        .meddpicc-detail {\n            font-size: 13px;\n            color: #555;\n            line-height: 1.5;\n        }\n\n        .gap-highlight {\n            padding: 15px;\n            background: #fff3cd;\n            border-left: 4px solid #f39c12;\n            border-radius: 4px;\n            margin: 20px 0;\n            font-size: 13px;\n            color: #856404;\n        }\n\n        .gap-highlight strong {\n            display: block;\n            margin-bottom: 5px;\n        }\n\n        .strategic-summary {\n            background: #f9f9f9;\n            padding: 20px;\n            border-radius: 6px;\n            border: 1px solid #ecf0f1;\n        }\n\n        .one-liner {\n            font-size: 15px;\n            font-weight: 600;\n            color: #1a1a2e;\n            margin-bottom: 15px;\n            line-height: 1.6;\n        }\n\n        .action-item {\n            margin-bottom: 12px;\n        }\n\n        .action-label {\n            font-size: 12px;\n            font-weight: 700;\n            text-transform: uppercase;\n            letter-spacing: 0.5px;\n            color: #555;\n            margin-bottom: 4px;\n        }\n\n        .action-detail {\n            font-size: 14px;\n            color: #1a1a2e;\n            margin-bottom: 8px;\n        }\n\n        .key-risks {\n            display: flex;\n            flex-direction: column;\n            gap: 10px;\n        }\n\n        .risk-item {\n            display: flex;\n            gap: 10px;\n            font-size: 13px;\n            padding: 10px;\n            background: #fdf5f5;\n            border-radius: 4px;\n        }\n\n        .risk-icon {\n            font-weight: bold;\n            color: #e74c3c;\n            flex-shrink: 0;\n            width: 20px;\n            text-align: center;\n        }\n\n        .risk-text {\n            flex: 1;\n        }\n\n        .footer {\n            background: #f5f5f5;\n            padding: 20px 30px;\n            border-top: 1px solid #ecf0f1;\n            font-size: 12px;\n            color: #777;\n            text-align: center;\n        }\n\n        .forecast-box {\n            background: linear-gradient(135deg, #f39c12, #e67e22);\n            color: white;\n            padding: 15px;\n            border-radius: 6px;\n            margin: 15px 0;\n            font-weight: 600;\n            text-align: center;\n        }\n\n        .three-move {\n            display: flex;\n            flex-direction: column;\n            gap: 12px;\n        }\n\n        .move {\n            padding: 12px;\n            background: #f9f9f9;\n            border-left: 4px solid #f39c12;\n            border-radius: 4px;\n        }\n\n        .move-label {\n            font-size: 12px;\n            font-weight: 700;\n            text-transform: uppercase;\n            color: #666;\n            margin-bottom: 4px;\n        }\n\n        .move-detail {\n            font-size: 13px;\n            color: #1a1a2e;\n            line-height: 1.5;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <!-- HEADER -->\n        <div class=\"header\">\n            <div class=\"header-top\">\n                <div>\n                    <div class=\"company-name\">Amplify Education</div>\n                    <div class=\"company-subtitle\">K-12 Curriculum & Assessment | Brooklyn, NY | ~3,000 employees</div>\n                </div>\n                <div class=\"health-badge\">\n                    <div class=\"health-indicator at-risk\"></div>\n                    <span>AT RISK</span>\n                </div>\n            </div>\n\n            <div class=\"header-metrics\">\n                <div class=\"metric\">\n                    <div class=\"metric-label\">ARR</div>\n                    <div class=\"metric-value\">$850K</div>\n                </div>\n                <div class=\"metric\">\n                    <div class=\"metric-label\">Stage</div>\n                    <div class=\"metric-value\">Procurement</div>\n                </div>\n                <div class=\"metric\">\n                    <div class=\"metric-label\">Close Date</div>\n                    <div class=\"metric-value\">March 31 (17 days)</div>\n                </div>\n            </div>\n\n            <div class=\"forecast-box\" style=\"margin-top: 15px;\">\n                \ud83d\udcca Best Case \u2014 NOT Commit\n            </div>\n        </div>\n\n        <!-- CONTENT -->\n        <div class=\"content\">\n            <!-- THE ISSUE -->\n            <div class=\"section\">\n                <div class=\"section-title\">The Situation</div>\n                <div class=\"one-liner\">\n                    We've won the technical evaluation and have the right champion, but the Economic Buyer's formal approval is NOT YET SECURED with 17 days to close. The critical business case has not been formally submitted to Catherine Mackay.\n                </div>\n            </div>\n\n            <!-- MEDDPICC SCORECARD -->\n            <div class=\"section\">\n                <div class=\"section-title\">MEDDPICC Scorecard</div>\n\n                <div class=\"meddpicc-grid\">\n                    <div class=\"meddpicc-item strong\">\n                        <div class=\"meddpicc-label\">\n                            <span class=\"status-dot strong\"></span>\n                            Metrics\n                        </div>\n                        <div class=\"meddpicc-detail\">ROI model built but not yet formally reviewed by Catherine. Needs to be reframed around cost avoidance (doubling support headcount).</div>\n                    </div>\n\n                    <div class=\"meddpicc-item developing\">\n                        <div class=\"meddpicc-label\">\n                            <span class=\"status-dot developing\"></span>\n                            Economic Buyer\n                        </div>\n                        <div class=\"meddpicc-detail\">Catherine Mackay (President/COO) met in exec meeting but APPROVAL NOT YET SECURED. This is the critical blocker.</div>\n                    </div>\n\n                    <div class=\"meddpicc-item strong\">\n                        <div class=\"meddpicc-label\">\n                            <span class=\"status-dot strong\"></span>\n                            Decision Criteria\n                        </div>\n                        <div class=\"meddpicc-detail\">Clear \u2014 Catherine evaluates on cost/ROI. Technical team chose Glean. We win on both.</div>\n                    </div>\n\n                    <div class=\"meddpicc-item developing\">\n                        <div class=\"meddpicc-label\">\n                            <span class=\"status-dot developing\"></span>\n                            Decision Process\n                        </div>\n                        <div class=\"meddpicc-detail\">Tech eval \u2705 \u2192 Business case to Catherine (NOT YET SUBMITTED) \u2192 Approval (pending) \u2192 Legal/procurement \u2192 Signature. 17 days left.</div>\n                    </div>\n\n                    <div class=\"meddpicc-item strong\">\n                        <div class=\"meddpicc-label\">\n                            <span class=\"status-dot strong\"></span>\n                            Identify Pain\n                        </div>\n                        <div class=\"meddpicc-detail\">Strong \u2014 Must double support headcount without Glean. Compelling event: live before June peak season (hard constraint).</div>\n                    </div>\n\n                    <div class=\"meddpicc-item strong\">\n                        <div class=\"meddpicc-label\">\n                            <span class=\"status-dot strong\"></span>\n                            Champion\n                        </div>\n                        <div class=\"meddpicc-detail\">Rick McMorrow (CIO) is strong but business case delivery is overdue. Multi-person team (Aaron, Kevin, Sarah) also engaged.</div>\n                    </div>\n\n                    <div class=\"meddpicc-item strong\">\n                        <div class=\"meddpicc-label\">\n                            <span class=\"status-dot strong\"></span>\n                            Competition\n                        </div>\n                        <div class=\"meddpicc-detail\">No vendor competition \u2014 Glean won technical. Real risk is status quo or build-internally narrative.</div>\n                    </div>\n                </div>\n\n                <div class=\"gap-highlight\">\n                    <strong>\ud83d\udea8 Critical Gap:</strong> Catherine's formal approval is NOT YET SECURED. The business case has not been formally submitted. This must happen by March 17 to have any realistic chance of closing by March 31.\n                </div>\n            </div>\n\n            <!-- STRATEGIC SUMMARY -->\n            <div class=\"section\">\n                <div class=\"section-title\">Strategic Summary</div>\n\n                <div class=\"strategic-summary\">\n                    <div class=\"one-liner\" style=\"margin-bottom: 20px;\">\n                        <strong>Deal in One Sentence:</strong> Amplify is a $850K deal we've won technically with the right champion, but the Economic Buyer's formal approval is NOT YET SECURED with 17 days to close \u2014 our next 72 hours are critical.\n                    </div>\n\n                    <div class=\"action-item\">\n                        <div class=\"action-label\">#1 Priority (Next 72 Hours):</div>\n                        <div class=\"action-detail\">Get the business case + ROI model formally in front of Catherine Mackay by March 17, framed in her cost/ROI language, with a clear ask for approval by March 20. Everything else downstream depends on Catherine's greenlight.</div>\n                    </div>\n\n                    <div class=\"action-item\">\n                        <div class=\"action-label\">The 3-Move Play:</div>\n                        <div class=\"three-move\">\n                            <div class=\"move\">\n                                <div class=\"move-label\">This Week (March 14-17)</div>\n                                <div class=\"move-detail\">1) Call Rick \u2014 map exact process steps remaining. 2) Refine ROI one-pager for Catherine (cost avoidance frame). 3) Send to Rick with messaging guidance for Catherine presentation.</div>\n                            </div>\n                            <div class=\"move\">\n                                <div class=\"move-label\">Next Week (March 18-24)</div>\n                                <div class=\"move-detail\">4) Follow up on Catherine's decision. 5) Brief manager Kara \u2014 \"Best Case, not Commit. Catherine approval is the gate.\" 6) Coordinate legal/procurement on execution timeline if Catherine approves.</div>\n                            </div>\n                            <div class=\"move\">\n                                <div class=\"move-label\">Before Close (March 25-31)</div>\n                                <div class=\"move-detail\">7) Activate Brad Scott if needed for executive follow-up. 8) Oversee legal/procurement contract execution. 9) Confirm signature by March 31.</div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <!-- KEY RISKS -->\n            <div class=\"section\">\n                <div class=\"section-title\">Key Risks</div>\n\n                <div class=\"key-risks\">\n                    <div class=\"risk-item\">\n                        <div class=\"risk-icon\">\u26a0\ufe0f</div>\n                        <div class=\"risk-text\"><strong>Catherine delays approval</strong> \u2014 If she takes until March 25+ to review/approve, there's no time for legal/procurement to execute by March 31.</div>\n                    </div>\n                    <div class=\"risk-item\">\n                        <div class=\"risk-icon\">\u26a0\ufe0f</div>\n                        <div class=\"risk-text\"><strong>Business case doesn't resonate</strong> \u2014 If ROI model isn't in Catherine's language, she'll ask for refinements, burning time.</div>\n                    </div>\n                    <div class=\"risk-item\">\n                        <div class=\"risk-icon\">\u26a0\ufe0f</div>\n                        <div class=\"risk-text\"><strong>Hidden build-vs-buy concern</strong> \u2014 If Catherine or AI team has internal objections that weren't surfaced in exec meeting, this could derail.</div>\n                    </div>\n                    <div class=\"risk-item\">\n                        <div class=\"risk-icon\">\u26a0\ufe0f</div>\n                        <div class=\"risk-icon\" style=\"margin-left: -32px; width: 0;\"></div>\n                        <div class=\"risk-text\"><strong>Legal/procurement bottleneck</strong> \u2014 If Catherine approves March 20 but legal finds open contract issues, 11 days is tight to resolve.</div>\n                    </div>\n                </div>\n            </div>\n\n            <!-- CRITICAL ACTIONS -->\n            <div class=\"section\">\n                <div class=\"section-title\">What You Need to Do This Week</div>\n\n                <div class=\"action-item\">\n                    <div class=\"action-label\">TODAY/TOMORROW:</div>\n                    <div class=\"action-detail\">\ud83d\udd34 Call Rick McMorrow. Ask: \"What do you need to present the business case to Catherine this week? What's blocking you?\" Get specific.</div>\n                </div>\n\n                <div class=\"action-item\">\n                    <div class=\"action-label\">By March 16:</div>\n                    <div class=\"action-detail\">\u270f\ufe0f Refine the ROI one-pager for Catherine. Reframe around cost avoidance (doubling support headcount) + June deployment deadline creates urgency. This is the document Rick presents.</div>\n                </div>\n\n                <div class=\"action-item\">\n                    <div class=\"action-label\">By March 17:</div>\n                    <div class=\"action-detail\">\ud83d\udce7 Get refined business case to Rick with framing guidance. Include specific ask: \"Can you present this to Catherine and confirm her approval by March 20?\"</div>\n                </div>\n\n                <div class=\"action-item\">\n                    <div class=\"action-label\">By March 16:</div>\n                    <div class=\"action-detail\">\ud83d\udcde Brief manager Kara. \"Amplify is Best Case, not Commit. Catherine's approval is the gate. We're submitting business case this week.\"</div>\n                </div>\n            </div>\n\n            <!-- FORECAST NOTES -->\n            <div class=\"section\">\n                <div class=\"section-title\">Forecast Recommendation</div>\n                <div class=\"strategic-summary\">\n                    <strong>BEST CASE (not Commit)</strong>\n                    <br><br>\n                    <strong>Why:</strong> Commit requires EB signature or explicit written approval. We have neither. Catherine has not yet approved the deal.\n                    <br><br>\n                    <strong>Path to Commit:</strong> If Catherine approves by March 20 in writing with no caveats, escalate to Commit.\n                    <br><br>\n                    <strong>Confidence Level:</strong> 65-70% we close by March 31 IF execution is flawless. This is our upside play this quarter.\n                </div>\n            </div>\n        </div>\n\n        <!-- FOOTER -->\n        <div class=\"footer\">\n            <strong>Deal Strategy Session</strong> \u2014 March 14, 2026 | Prepared for leadership review | Trigger: Close date approaching (17 days)\n        </div>\n    </div>\n</body>\n</html>"}], "grading": {"expectations": [{"text": "Analysis references specific Amplify stakeholders by name (Catherine Mackay, Rick McMorrow, Aaron Harnly, etc.)", "passed": true, "evidence": "Catherine Mackay (President/COO), Rick McMorrow (CIO), Aaron Harnly (CTO), Kevin Keogan (SVP IT), Sarah Barnes (VP L&D) all named and analyzed with specific roles and relationships."}, {"text": "MEDDPICC assessment covers all 7 elements with status indicators", "passed": true, "evidence": "All seven MEDDPICC elements present with color-coded status (\ud83d\udfe2 Strong, \ud83d\udfe1 Developing, \ud83d\udd34 Red) and detailed analysis for each: Metrics, Economic Buyer, Decision Criteria, Decision Process, Identify Pain, Champion, Competition."}, {"text": "Economic Buyer is flagged as a gap since Catherine hasn't given final approval", "passed": true, "evidence": "Economic Buyer section explicitly states 'Catherine's explicit written or verbal approval of this deal \u2014 This is the #1 missing piece' and 'Economic Buyer \u2014 \ud83d\udfe1 DEVELOPING (borderline WEAK)' highlighting that Catherine has NOT formally approved despite meeting her."}, {"text": "Deal health assessment gives an honest forecast recommendation", "passed": true, "evidence": "Overall Health explicitly rated \ud83d\udfe1 'AT RISK' with detailed reasoning. Forecast recommendation: 'BEST CASE (not Commit)' with 65-70% confidence and clear reasoning: 'A Commit deal has... We have NEITHER. Catherine has not approved this deal in writing.'"}, {"text": "Strategic recommendations include specific time-bound actions", "passed": true, "evidence": "Extensive 3-Move Play with specific dates: 'THIS WEEK (March 14-17)', 'NEXT WEEK (March 18-24)', 'BEFORE CLOSE DATE (March 25-31)' with numbered action items including 'Call Rick McMorrow', 'Refine the ROI one-pager', 'Send refined business case to Rick', etc. Each includes specific deadlines."}, {"text": "An HTML one-pager file is created", "passed": true, "evidence": "File exists: /sessions/beautiful-inspiring-shannon/deal-strategy-workspace/iteration-1/eval-1-amplify-close-urgency/with_skill/outputs/amplify-education-deal-strategy.html"}, {"text": "After analysis, proactively offers to build a specific deliverable to close the biggest gap (e.g., ROI model for Catherine)", "passed": false, "evidence": "The analysis does not include a proactive offer to build a specific deliverable after the strategic recommendations. While the transcript references 'Reframe the existing ROI model' as an action, there is no explicit statement offering Claude to build this for Lauren (e.g., 'I can build a Catherine-specific ROI one-pager for you')."}], "summary": {"passed": 6, "failed": 1, "total": 7, "pass_rate": 0.86}}}, {"id": "eval-1-amplify-close-urgency-without_skill", "prompt": "deal strategy for Amplify \u2014 close date is in 17 days and I need to figure out if this is really going to close", "eval_id": 1, "outputs": [{"name": "EXECUTIVE-SUMMARY.txt", "type": "text", "content": "================================================================================\nAMPLIFY EDUCATION \u2014 DEAL STRATEGY ANALYSIS\n================================================================================\n\nDate: March 14, 2026\nDeal: Amplify Education | $850K ARR | Closes in 17 days (March 31)\nStatus: BEST CASE (likely slip without immediate action)\nForecast: 40\u201350% March close | 70\u201380% April close\n\n================================================================================\nBOTTOM LINE\n================================================================================\n\nYou won the deal technically. Glean was selected. Catherine Mackay (President) \nattended the executive meeting. But she hasn't formally approved the business \ncase yet. That's your blocker.\n\nYOU SHOULD NOT COUNT THIS AS A MARCH CLOSE.\n\nThe critical path requires:\n  1. Get business case to Catherine (March 17\u201318)\n  2. Catherine decides (March 20\u201322)\n  3. Legal/procurement (March 22\u201331)\n\nWith 17 days total, that timeline is TIGHT. You need Catherine to move fast.\n\n================================================================================\nMEDDPICC SCORECARD\n================================================================================\n\n\u2705 Metrics              \u2014 ROI model exists; not yet reviewed by Catherine\n\ud83d\udd34 Economic Buyer      \u2014 Catherine hasn't formally approved yet (RED FLAG)\n\u2705 Decision Criteria   \u2014 Cost/ROI focused; clear\n\u26a0\ufe0f  Decision Process    \u2014 Business case submission overdue; timeline unknown\n\u2705 Identify Pain       \u2014 Strong (support headcount doubling, June deadline)\n\u2705 Champion            \u2014 Multi-person team; Rick is primary\n\u2705 Competition         \u2014 No vendor competition; build vs. buy is the risk\n\nOVERALL: 5/7 green, 2/7 yellow. But Economic Buyer approval is not yet secured.\nThis is a high-risk deal masquerading as a win.\n\n================================================================================\nYOUR 17-DAY ACTION PLAN\n================================================================================\n\nTODAY (March 14):\n  [ ] Call Rick McMorrow. Ask:\n      \u2022 When is he presenting business case to Catherine?\n      \u2022 What does Catherine need to approve?\n      \u2022 What's the legal/procurement timeline after her approval?\n  [ ] Brief Kara: \"Amplify is Best Case, not Commit.\"\n\nMarch 16\u201317:\n  [ ] Finalize Catherine's business case one-pager (cost avoidance focused)\n  [ ] Send to Rick for presentation to Catherine by March 18\n\nMarch 20\u201322:\n  [ ] Follow up on Catherine's decision\n  [ ] If YES \u2192 Activate legal/procurement immediately\n  [ ] If NO/MAYBE \u2192 Adjust forecast to April\n\nMarch 22\u201331:\n  [ ] Daily check-in with legal on contract progress\n  [ ] If slipping past March 31 \u2192 Update forecast immediately\n\n================================================================================\nPROBABILITY & FORECAST\n================================================================================\n\nBEST CASE (March 31 close):\n  \u2022 Catherine approves business case by March 20\n  \u2022 Legal turns contract in 7\u201310 days\n  \u2022 Signature by March 31\n  \u2022 Probability: 40\u201350% (requires flawless execution)\n\nLIKELY CASE (April close):\n  \u2022 Catherine takes until March 24\u201326 to decide\n  \u2022 Legal needs 7\u201310 days after approval\n  \u2022 Realistic signature: April 2\u20137\n  \u2022 Probability: 70\u201380%\n\nACTION: After you talk to Rick, update your forecast accordingly. Don't sit \nwith March 31 unless you're confident Catherine will decide by March 20.\n\n================================================================================\nKEY RISK: Economic Buyer Not Yet Committed\n================================================================================\n\nCatherine Mackay (President/COO) is the gating item. She has:\n  \u2705 Met with Arvind + your team (executive meeting completed)\n  \u2705 Seen the ROI model and technical evaluation\n  \u274c NOT formally approved the business case yet\n  \u274c NOT signed off on the deal\n\nWithout her explicit approval, you're at risk of:\n  \u2022 Indefinite delay while she seeks CFO/Board input\n  \u2022 Request for renegotiation on pricing\n  \u2022 Deprioritization in favor of competing initiatives\n  \u2022 Formal \"no\" if she doesn't see the ROI\n\nMITIGATION: Get the business case in front of her by March 18. Use Rick as \nyour messenger (he has credibility). Frame it in her language: cost avoidance \n(not features), June deadline urgency, strategic alignment with AI strategy.\n\n================================================================================\nWHAT TO DO RIGHT NOW\n================================================================================\n\n1. CALL RICK MCELMO THIS AFTERNOON.\n   Ask: \"When are you presenting the business case to Catherine? What does \n        she need to see to say yes? What's legal/procurement timeline?\"\n\n2. BRIEF KARA.\n   Say: \"Amplify is Best Case, not Commit. Catherine approves this week.\n        Realistic close is early April pending decision speed.\"\n\n3. FINALIZE CATHERINE'S ONE-PAGER.\n   Lead with cost avoidance ($X in support headcount), June deadline, \n   strategic alignment. One page. Executive-level. No features.\n\n4. SEND TO RICK MARCH 17.\n   Ask: \"Can you present this to Catherine by March 18?\"\n\n5. FOLLOW UP MARCH 20.\n   \"Did Catherine decide? What are her next steps?\"\n\n================================================================================\nIF THIS SLIPS\n================================================================================\n\nIf Catherine doesn't approve by March 25:\n  \u2022 Assume April close (realistic 14\u201321 days post-approval)\n  \u2022 Update forecast immediately (don't wait for pipeline review)\n  \u2022 Dig into other deals to hit quota (this deal is 220% of quarterly target)\n  \u2022 Map April milestone dates with Rick\n\nDon't panic sell. If Catherine needs time, give it to her. Use Rick as your \nbuffer. Pushing too hard will backfire.\n\n================================================================================\nFILES INCLUDED\n================================================================================\n\n1. transcript.md (14KB)\n   Full deal strategy analysis with MEDDPICC gaps, risk assessment, \n   17-day action plan, and probability assessment.\n\n2. amplify-17day-action-plan.md (4.3KB)\n   Day-by-day tactical checklist. Use this as your working document.\n\n3. amplify-catherine-business-case-template.md (5.9KB)\n   One-page business case for Rick to present to Catherine. \n   Formatted in her language (cost, ROI, strategy).\n\n4. README.md (5KB)\n   Overview of all files and how to use them.\n\n================================================================================\nKEY METRIC\n================================================================================\n\nWith 17 days remaining, you need Catherine to decide in 10 days or less.\nAnything slower than that compresses legal/procurement to unrealistic timelines.\n\nYour job: Get the business case to Catherine by March 18. \nGet her decision by March 22.\nEverything else flows from there.\n\n================================================================================\n"}, {"name": "README.md", "type": "text", "content": "# Amplify Education Deal Strategy Analysis\n\n**Date:** March 14, 2026\n**Analyst:** Claude (AI Sales Partner)\n**Deal:** Amplify Education | $850K ARR | Close Date: March 31, 2026 (17 days)\n**Status:** Best Case (likely slip without immediate action)\n\n---\n\n## Files in This Folder\n\n### 1. **transcript.md** (Main Analysis)\nComprehensive deal strategy assessment including:\n- Bottom line assessment (don't count on March 31 close)\n- Full MEDDPICC scorecard and gap analysis\n- Risk assessment (why the deal might slip)\n- 17-day action plan with prioritized tasks\n- Probability assessment (40\u201350% March close without execution)\n- What you need to test: Can Catherine approve in 10 days?\n\n**Read this first.** It's the full strategic brief.\n\n### 2. **amplify-17day-action-plan.md** (Tactical Checklist)\nDay-by-day action plan broken into:\n- This week (get Catherine's approval)\n- Next week (execute on approval)\n- Final week (close or slip)\n- Key phone calls you need to make\n- Timeline for best case vs. likely case\n\n**Use this as your working document.** Check off tasks as you complete them.\n\n### 3. **amplify-catherine-business-case-template.md** (Executive Briefing)\nOne-page business case template tailored to Catherine Mackay, formatted in her language (cost avoidance, ROI, strategic alignment):\n- Executive summary\n- Problem: cost of fragmentation\n- Solution: Glean as knowledge layer\n- Financial impact with ROI math\n- Strategic alignment (AI strategy, growth, peak season)\n- Risk comparison (do nothing vs. build vs. buy)\n- Next steps\n\n**Share this with Rick.** He presents this to Catherine.\n\n---\n\n## Key Findings\n\n### The Core Issue\nYou won technically. Glean was selected. Catherine attended the exec meeting. But **she hasn't formally approved the deal yet.** The business case hasn't been submitted to her for decision.\n\n**With 17 days remaining, this is your gating item.** Everything else (legal, procurement) is downstream.\n\n### The Critical Path (Next 10 Days)\n1. **Get business case to Catherine** (March 17\u201318) \u2014 Rick presents\n2. **Catherine decides** (March 20\u201322) \u2014 She approves or asks for changes\n3. **Legal/procurement moves** (March 22\u201329) \u2014 7\u201310 days for contract\n4. **Sign** (March 31) \u2014 Tight, but doable IF Catherine approves early\n\n### Probability Assessment\n- **March 31 close:** 40\u201350% (requires flawless execution)\n- **April close:** 70\u201380% (more realistic timeline)\n\nThe gap: Catherine needs 10+ days to make a decision, and legal/procurement needs 7\u201310 days. That's 17\u201320 days. You have 17.\n\n### Your Next Move (Today)\n**Call Rick McMorrow.** Ask:\n- When is he presenting the business case to Catherine?\n- What does Catherine need to approve?\n- What's realistic legal/procurement timeline after her approval?\n\nThis is your decision node. Everything else flows from Rick's answer.\n\n---\n\n## What's Working in Your Favor\n\n\u2705 Technical win \u2014 Glean was selected, competitors neutralized\n\u2705 Champion team \u2014 Rick, Aaron, Kevin, Sarah all aligned\n\u2705 Compelling event \u2014 June peak season deadline creates urgency\n\u2705 Economic buyer access \u2014 Catherine met with you (via Arvind)\n\u2705 Clear ROI case \u2014 Catherine is cost/ROI focused; you have numbers\n\n## What's Working Against You\n\n\u26a0\ufe0f No formal EB approval yet \u2014 Catherine hasn't said yes\n\u26a0\ufe0f Business case not submitted \u2014 Rick's action, but overdue\n\u26a0\ufe0f Tight timeline \u2014 17 days for 3+ sequential process steps\n\u26a0\ufe0f Procurement unknown \u2014 Don't know if legal can turn 10-day contract\n\u26a0\ufe0f Build risk \u2014 Amplify has internal AI team; \"build vs. buy\" is real objection\n\n---\n\n## Bottom Line for Kara\n\nWhen you brief your manager, say this:\n\n*\"Amplify is Best Case, not Commit. We won technically\u2014Glean was selected and Catherine's team is aligned. But Catherine Mackay hasn't formally approved the business case yet. Rick is presenting it to her this week. Realistic close is mid-April pending her decision speed and legal/procurement turnaround. I'm treating this as April unless Catherine approves by March 20 and legal moves fast.\"*\n\nThis sets realistic expectations and prevents an ugly surprise on pipeline review.\n\n---\n\n## How to Use These Documents\n\n1. **Read transcript.md** to understand the full deal picture and risk landscape\n2. **Use amplify-17day-action-plan.md** as your daily checklist\n3. **Share amplify-catherine-business-case-template.md** with Rick for his presentation to Catherine\n4. **Call Rick today** with the key questions from the action plan\n5. **Update your forecast** after you talk to him (likely to April, not March)\n\n---\n\n## Questions?\n\nThis analysis is based on your context files as of March 14, 2026. If material changes:\n- Catherine approves (great! shift to legal acceleration)\n- Catherine asks for changes (iterate fast; adjust forecast to April)\n- Legal timeline extends beyond 10 days (call it April now)\n- Rick can't meet with Catherine until late March (defer close to April)\n\nKeep this assessment live. Update your forecast weekly.\n\n---\n\n**Good luck. You've got this deal \u2014 just need Catherine to commit fast.**\n"}, {"name": "amplify-17day-action-plan.md", "type": "text", "content": "# Amplify Education \u2014 17-Day Close Action Plan\n\n**Deal:** Amplify Education | $850K | Close Date: March 31 (17 days)\n**Status:** Best Case (likely slip without execution)\n**Key Blocker:** Catherine Mackay (Economic Buyer) hasn't formally approved yet\n\n---\n\n## This Week (March 14\u201320) \u2014 GET CATHERINE'S APPROVAL\n\n### TODAY: March 14\n- [ ] **Call Rick McMorrow.** Ask:\n  - When is he presenting business case to Catherine? (needs to be March 17\u201318)\n  - What does Catherine need to approve? (cost numbers, deployment timeline, both?)\n  - Who else is in the approval loop? (CFO, Board, just Catherine?)\n  - What's realistic timeline for legal/procurement after her approval?\n\n- [ ] **Brief Kara:** \"Amplify is Best Case, not Commit. Catherine approving this week. Real close depends on her decision speed.\"\n\n### March 16\u201317\n- [ ] **Finalize Catherine's business case one-pager** (reframe around cost avoidance, not features)\n  - Lead with: \"By deploying Glean before peak season, Amplify avoids $X in support headcount costs\"\n  - Include June deadline context\n  - One page. Exec-level.\n\n- [ ] **Send to Rick with clear ask:** \"Present this to Catherine by March 18. When can you do it?\"\n\n### March 18\u201320\n- [ ] **Follow up with Rick if no update.** \"Did Catherine get the business case? What's her timeline for a decision?\"\n- [ ] **Prepare backup:** If Rick stalls, send Catherine a brief email (via Rick or direct): \"Wanted to make sure you got the business case. Happy to dive deeper on any questions.\"\n\n---\n\n## Next Week (March 21\u201327) \u2014 EXECUTE ON APPROVAL\n\n### March 22 (Decision Day)\n- [ ] **Catherine says YES:**\n  - Immediately call Joe Colliss (legal). \"Catherine just approved. 48-hour critical path?\"\n  - Brief Kara: \"Deal is moving to legal/procurement. Targeting March 31 close.\"\n\n- [ ] **Catherine says MAYBE or NO:**\n  - Don't spin. Clarify what she needs.\n  - Adjust forecast to April.\n  - Ask Rick what the next step is.\n\n### March 24\u201327\n- [ ] **Daily check-in with Joe (legal).** \"Where are we on contract?\"\n- [ ] **Keep Rick in the loop.** \"Any other approvals Catherine needs?\"\n- [ ] **Flag for Mihir (SE).** Any technical questions from Catherine's procurement team, he's the POC.\n\n---\n\n## Final Week (March 28\u201331) \u2014 CLOSE OR SLIP\n\n### March 28\n- [ ] **Status check.** Is the contract signed yet? If not:\n  - What's the blocker?\n  - Can it be resolved in 3 days?\n  - If not, formally update forecast to April.\n\n### March 29\u201331\n- [ ] **Final push.** If contract is close, escalate anything blocking signature.\n- [ ] **If this slips:** Report to Kara immediately. \"Amplify slipping to April. Catherine approved, but legal/procurement timeline extended to [date].\"\n\n---\n\n## Key Phone Calls This Week\n\n| Call | With | Ask | Target Date |\n|------|------|-----|-------------|\n| Business case timeline | Rick McMorrow (CIO) | When presenting to Catherine? | Today (3/14) |\n| Procurement timeline | Rick | How long after Catherine approves? | March 17\u201318 |\n| Check-in (if no update) | Rick | Did Catherine get the case? | March 20 |\n| Legal activation | Joe Colliss | 48-hour critical path post-approval | March 22 |\n\n---\n\n## If Catherine Approves (Best Case)\n\nTimeline:\n- Catherine says yes: March 22\n- Legal/procurement starts: March 22\n- Contract executed: March 28\u201329\n- Close: March 31 \u2705\n\nThis is tight but doable **if** legal doesn't slow-walk.\n\n---\n\n## If Catherine Delays (Most Likely)\n\nTimeline:\n- Catherine reviews case: March 20\u201322\n- Catherine asks for changes: March 23\u201324\n- You iterate: March 24\u201326\n- Catherine finally approves: March 26\u201327\n- Legal/procurement: March 27\u201331\n- **Realistic close: April 2\u20137**\n\n\u2192 Update Kara and forecast accordingly.\n\n---\n\n## The Hard Truth\n\n**You likely don't close this March 31 unless Catherine approves by March 20.** Legal/procurement at a $272M company takes 7\u201310 days minimum. You have 17 days total. That leaves you 7\u201310 days max for Catherine's decision.\n\n**Your job is to accelerate Catherine to a decision this week.** Everything else is cleanup.\n\n---\n\n## Success = Catherine Says Yes by March 22\n\nIf you can get there, you have a real shot at March 31. If she doesn't commit by March 22, call it an April deal and move on to other pipeline acceleration.\n\n**Keep it simple. Get the business case to Catherine. Get her approval. Get legal to move fast. That's it.**\n"}, {"name": "amplify-catherine-business-case-template.md", "type": "text", "content": "# AMPLIFY EDUCATION \u2014 GLEAN BUSINESS CASE\n**Prepared for:** Catherine Mackay, President & COO\n**Prepared by:** Rick McMorrow, CIO (Glean partnership)\n**Date:** March 17, 2026\n\n---\n\n## Executive Summary\n\nAmplify's rapid growth (40% annualized) and expanded AI strategy (Colleague AI, custom ASR, new Classroom platform) require a unified knowledge layer that connects fragmented systems. Without this, support and operations costs will scale linearly with headcount. Glean eliminates this cost pressure while enabling faster product innovation cycles.\n\n**Recommendation:** Deploy Glean to 4,000 users across product, engineering, curriculum, sales, and operations. ROI: $X over Year 1. Must be live before June peak season.\n\n---\n\n## The Problem: Cost of Fragmentation\n\n**Today:** ~3,000 employees work across disconnected systems (Slack, email, Jira, Salesforce, Confluence, OneDrive, SharePoint, etc.). Knowledge is scattered. When employees need information, they:\n- Ask colleagues (slow, disrupts others)\n- Search multiple systems (frustrating, incomplete)\n- Wait for support/admin to help (expensive escalation)\n\n**Result:** Support headcount grows faster than user base.\n\n**Projection without Glean:** To support peak season (June), operations will need to add ~X headcount to handle search queries, documentation, and knowledge requests.\n\n**Cost:** ~$X annually (loaded cost of X new hires)\n\n---\n\n## The Solution: Unified Knowledge Layer with Glean\n\nGlean is a Work AI platform that:\n- Connects 100+ business systems (everything your employees already use)\n- Understands permissions so users only see what they're allowed to see\n- Delivers answers and suggestions in seconds vs. minutes or hours\n- Works across any model/cloud \u2014 no vendor lock-in\n\n**For Amplify specifically:**\n- Customers/partners can self-serve knowledge about Amplify products (reduce support escalations)\n- New hires onboard faster (knowledge at their fingertips, not scattered across 10 systems)\n- Product/engineering teams move faster (one place to find design decisions, customer feedback, technical context)\n- Support and ops teams reduce manual work (Glean handles routine questions)\n- Colleague AI and custom ASR projects have a unified knowledge foundation (Glean as the platform layer)\n\n---\n\n## Financial Impact\n\n### Year 1 Savings: ~$X\n\n| Item | Today | With Glean | Savings |\n|------|-------|-----------|---------|\n| Support headcount required for peak season | X FTE | X-Y FTE | $X |\n| Avg time to find information (hours/employee/year) | 16 hrs | 4 hrs | $X (productivity, X employees) |\n| New hire onboarding time | 8 weeks | 6 weeks | $X (faster productivity) |\n| **Total Year 1 Benefit** | | | **~$X** |\n| **Glean Cost (4,000 users, annual)** | | | **$(cost)** |\n| **Net Year 1 Benefit** | | | **$X** |\n\n**Payback period:** X months\n\n### Year 2+ Impact\n\nOnce deployed, Glean compounds:\n- Support headcount growth slows (you hire to growth, not to handle cost of fragmentation)\n- AI initiatives (Colleague AI, custom ASR) run faster and better (unified knowledge)\n- Employee satisfaction increases (less time searching, more time on high-value work)\n- Estimated annual benefit Year 2+: $X\n\n---\n\n## Strategic Alignment\n\nThis investment aligns with Amplify's core priorities:\n\n1. **AI Strategy:** Glean is the knowledge platform underneath your internal AI builds (Colleague AI, custom ASR). Instead of each team building connectors and permissions separately, they build on top of Glean.\n\n2. **Growth & Scale:** At 40% annualized growth, you're doubling headcount every 2 years. Without a unified knowledge layer, you also double your support/admin costs. Glean flattens that curve.\n\n3. **Product Innovation:** Faster onboarding, better context = faster product iteration.\n\n4. **Peak Season Readiness:** You must be live before June. This is your forcing function.\n\n---\n\n## Implementation Timeline\n\n| Phase | Timeline | Outcome |\n|-------|----------|---------|\n| Contract & procurement | March\u2013early April | Signed MSA, deployment plan in place |\n| Phase 1 (4,000 users, core systems) | April\u2013May | Live across product, engineering, sales, ops |\n| Optimization & expansion | June+ | Monitor adoption, expand to additional departments or user count |\n\n**Critical requirement:** Live before June peak season (user surge, business criticality).\n\n---\n\n## Risk: Status Quo or Build Internally\n\n**Option A: Do nothing.** \u2192 Support headcount grows with users. No efficiency gains. Risk of bottleneck during peak season.\n\n**Option B: Build internally.** \u2192 NVIDIA and Uber both tried this. They discovered that connectors, permissions, and cross-system relevance at scale is a multi-year platform problem. They chose Glean instead. Build time vs. buy time: we can be live in 6\u20138 weeks; building takes 12\u201318 months + ongoing maintenance.\n\n**Option C: Deploy Glean.** \u2192 Live in 6\u20138 weeks. Proven platform. Known cost. Works with internal AI initiatives.\n\n---\n\n## Competitive Advantage\n\n- **Microsoft Copilot:** Connector-limited (M365 only); Glean is horizontal (100+ systems)\n- **Status quo:** No efficiency gains; growing cost pressure\n- **Internal build:** 12\u201318 months to reach feature parity; Glean is ready now\n\n---\n\n## Next Steps\n\n1. Finance validation on ROI assumptions (load, headcount cost, timeline)\n2. Legal/procurement to kick off MSA negotiation\n3. Begin deployment planning (IT, user communications, rollout phases)\n4. Set go-live target: May 1, 2026 (live before June peak season)\n\n---\n\n## Questions for Catherine?\n\nFeel free to connect directly with Lauren Ginsburg (Glean AE) or Arvind Jain (Glean CEO) if you want to dive deeper on:\n- Competitive positioning vs. Copilot or internal build\n- Customer reference calls (similar companies: Databricks, NVIDIA, LinkedIn engineering)\n- Pricing flexibility or contract terms\n- Technical risk mitigation\n\n---\n\n**Recommendation:** Approve this business case and move to procurement. Every week of delay compresses the deployment window before peak season.\n\n"}], "grading": {"expectations": [{"text": "Analysis references specific Amplify stakeholders by name (Catherine Mackay, Rick McMorrow, Aaron Harnly, etc.)", "passed": true, "evidence": "Catherine Mackay, Rick McMorrow, Aaron Harnly, Kevin Keogan all mentioned by name with titles in MEDDPICC scorecard and analysis."}, {"text": "MEDDPICC assessment covers all 7 elements with status indicators", "passed": true, "evidence": "Full MEDDPICC scorecard table with all 7 elements (Metrics, Economic Buyer, Decision Criteria, Decision Process, Identify Pain, Champion, Competition) with \ud83d\udfe2/\ud83d\udfe1/\ud83d\udd34 status indicators and assessment text."}, {"text": "Economic Buyer is flagged as a gap since Catherine hasn't given final approval", "passed": true, "evidence": "Economic Buyer section explicitly states 'Catherine Mackay met once (exec meeting) but has NOT formally approved' and marked \ud83d\udd34 Red with note 'Business case not yet submitted for her decision. This is your gating item.'"}, {"text": "Deal health assessment gives an honest forecast recommendation", "passed": true, "evidence": "Forecast recommendation: 'Best Case \u2192 Should be flagged as likely slip' with specific reasoning about Catherine approval gate and timeline pressure. Provides probability assessment: '40\u201350% close probability by March 31' and '65\u201370%' if Rick executes plan."}, {"text": "Strategic recommendations include specific time-bound actions", "passed": true, "evidence": "Detailed 17-day action plan with specific dates: 'TODAY (March 14)', 'March 17\u201318', 'March 22\u201324' with explicit actions like 'Call Rick McMorrow this afternoon', 'Send the one-pager to Rick with clear framing', 'Wait for Rick to confirm Catherine's decision'."}, {"text": "An HTML one-pager file is created", "passed": false, "evidence": "No HTML file in outputs directory. Without_skill outputs contain: EXECUTIVE-SUMMARY.txt, README.md, amplify-17day-action-plan.md, amplify-catherine-business-case-template.md, transcript.md. No .html file present."}, {"text": "After analysis, proactively offers to build a specific deliverable to close the biggest gap (e.g., ROI model for Catherine)", "passed": false, "evidence": "No explicit proactive offer to build a deliverable. The analysis identifies the business case as needed but does not offer to build it. The transcript ends with 'Go talk to Rick today' without offering Claude to build any specific artifact."}], "summary": {"passed": 5, "failed": 2, "total": 7, "pass_rate": 0.71}}}, {"id": "eval-2-forecast-call-prep-with_skill", "prompt": "where do we stand with Amplify? I have a forecast call with Kara tomorrow and need to know if I should call this a Commit or keep it Best Case", "eval_id": 2, "outputs": [{"name": "amplify-education-deal-strategy.html", "type": "text", "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Amplify Education \u2014 Deal Strategy</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n            background: #f5f5f5;\n            padding: 40px 20px;\n            color: #2c3e50;\n        }\n        .container {\n            max-width: 900px;\n            margin: 0 auto;\n            background: white;\n            border-radius: 8px;\n            box-shadow: 0 2px 8px rgba(0,0,0,0.1);\n            padding: 40px;\n        }\n\n        /* Header */\n        .header {\n            display: grid;\n            grid-template-columns: 1fr 1fr;\n            gap: 30px;\n            margin-bottom: 40px;\n            padding-bottom: 30px;\n            border-bottom: 2px solid #e8e8e8;\n        }\n        .company-info h1 {\n            font-size: 28px;\n            font-weight: 700;\n            margin-bottom: 12px;\n            color: #1a1a1a;\n        }\n        .company-meta {\n            display: grid;\n            grid-template-columns: 1fr 1fr;\n            gap: 12px;\n            font-size: 14px;\n            line-height: 1.6;\n        }\n        .company-meta strong {\n            color: #5a5a5a;\n            font-weight: 600;\n        }\n        .deal-health {\n            display: flex;\n            flex-direction: column;\n            align-items: flex-end;\n            justify-content: flex-start;\n        }\n        .health-badge {\n            display: flex;\n            align-items: center;\n            gap: 10px;\n            padding: 10px 16px;\n            border-radius: 6px;\n            margin-bottom: 12px;\n            background: #fff3cd;\n            border: 1px solid #ffc107;\n        }\n        .health-badge .circle {\n            width: 12px;\n            height: 12px;\n            border-radius: 50%;\n            background: #ff9800;\n        }\n        .health-badge strong {\n            font-weight: 600;\n            font-size: 14px;\n        }\n        .forecast-badge {\n            padding: 8px 14px;\n            border-radius: 4px;\n            background: #e8f4f8;\n            border: 1px solid #80deea;\n            font-size: 13px;\n            font-weight: 600;\n            color: #0277bd;\n        }\n\n        /* MEDDPICC Scorecard */\n        .meddpicc-section {\n            margin-bottom: 40px;\n        }\n        .meddpicc-section h2 {\n            font-size: 18px;\n            font-weight: 700;\n            margin-bottom: 20px;\n            color: #1a1a1a;\n        }\n        .meddpicc-grid {\n            display: grid;\n            grid-template-columns: repeat(2, 1fr);\n            gap: 16px;\n        }\n        .meddpicc-item {\n            padding: 16px;\n            border-radius: 6px;\n            border-left: 4px solid #ccc;\n        }\n        .meddpicc-item.strong {\n            background: #f0f8f4;\n            border-left-color: #27ae60;\n        }\n        .meddpicc-item.developing {\n            background: #fef6e4;\n            border-left-color: #ff9800;\n        }\n        .meddpicc-item.weak {\n            background: #fce4ec;\n            border-left-color: #e74c3c;\n        }\n        .meddpicc-item h3 {\n            font-size: 13px;\n            font-weight: 700;\n            color: #2c3e50;\n            text-transform: uppercase;\n            letter-spacing: 0.5px;\n            margin-bottom: 8px;\n        }\n        .meddpicc-item p {\n            font-size: 13px;\n            line-height: 1.5;\n            color: #555;\n        }\n        .status-indicator {\n            display: inline-block;\n            width: 10px;\n            height: 10px;\n            border-radius: 50%;\n            margin-right: 6px;\n        }\n        .status-indicator.strong {\n            background: #27ae60;\n        }\n        .status-indicator.developing {\n            background: #ff9800;\n        }\n        .status-indicator.weak {\n            background: #e74c3c;\n        }\n\n        /* Strategic Summary */\n        .strategic-section {\n            margin-bottom: 40px;\n        }\n        .strategic-section h2 {\n            font-size: 18px;\n            font-weight: 700;\n            margin-bottom: 20px;\n            color: #1a1a1a;\n        }\n        .strategic-item {\n            margin-bottom: 20px;\n        }\n        .strategic-item h3 {\n            font-size: 13px;\n            font-weight: 700;\n            text-transform: uppercase;\n            letter-spacing: 0.5px;\n            color: #2c3e50;\n            margin-bottom: 8px;\n        }\n        .strategic-item p {\n            font-size: 14px;\n            line-height: 1.6;\n            color: #333;\n        }\n        .three-moves {\n            background: #f9f9f9;\n            padding: 20px;\n            border-radius: 6px;\n            border-left: 4px solid #2196F3;\n        }\n        .three-moves ol {\n            margin: 0;\n            padding-left: 20px;\n        }\n        .three-moves li {\n            margin-bottom: 12px;\n            font-size: 13px;\n            line-height: 1.6;\n            color: #333;\n        }\n\n        /* Risks */\n        .risks-section {\n            margin-bottom: 30px;\n        }\n        .risks-section h2 {\n            font-size: 18px;\n            font-weight: 700;\n            margin-bottom: 16px;\n            color: #1a1a1a;\n        }\n        .risk-list {\n            display: grid;\n            gap: 12px;\n        }\n        .risk-item {\n            padding: 12px;\n            border-radius: 4px;\n            background: #fff5f5;\n            border-left: 3px solid #e74c3c;\n            font-size: 13px;\n            line-height: 1.5;\n        }\n        .risk-item strong {\n            color: #c0392b;\n            display: block;\n            margin-bottom: 4px;\n        }\n\n        /* Footer */\n        .footer {\n            text-align: center;\n            padding-top: 20px;\n            border-top: 1px solid #e8e8e8;\n            font-size: 12px;\n            color: #999;\n        }\n        .footer-time {\n            font-size: 11px;\n            color: #aaa;\n            margin-top: 8px;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <!-- HEADER -->\n        <div class=\"header\">\n            <div class=\"company-info\">\n                <h1>Amplify Education</h1>\n                <div class=\"company-meta\">\n                    <div><strong>Industry:</strong> EdTech (K-12)</div>\n                    <div><strong>Headcount:</strong> ~3,000</div>\n                    <div><strong>ARR:</strong> $850k</div>\n                    <div><strong>Stage:</strong> 7 \u2014 Procurement</div>\n                    <div><strong>Close Date:</strong> March 31, 2026</div>\n                    <div><strong>Time Remaining:</strong> 17 days</div>\n                </div>\n            </div>\n            <div class=\"deal-health\">\n                <div class=\"health-badge\">\n                    <div class=\"circle\"></div>\n                    <strong>AT RISK</strong>\n                </div>\n                <div class=\"forecast-badge\">Best Case</div>\n            </div>\n        </div>\n\n        <!-- MEDDPICC SCORECARD -->\n        <div class=\"meddpicc-section\">\n            <h2>MEDDPICC Scorecard</h2>\n            <div class=\"meddpicc-grid\">\n                <div class=\"meddpicc-item developing\">\n                    <h3><span class=\"status-indicator developing\"></span>Metrics</h3>\n                    <p>ROI model built (cost avoidance: 2x support headcount). <strong>Gap:</strong> Not yet formally reviewed by Catherine.</p>\n                </div>\n                <div class=\"meddpicc-item developing\">\n                    <h3><span class=\"status-indicator developing\"></span>Economic Buyer</h3>\n                    <p>Catherine Mackay, President. Met in exec meeting but formal approval not yet secured. <strong>Gap:</strong> No second conversation post-exec meeting.</p>\n                </div>\n                <div class=\"meddpicc-item strong\">\n                    <h3><span class=\"status-indicator strong\"></span>Decision Criteria</h3>\n                    <p>Clear: Catherine evaluates on cost/ROI. Technical team chose Glean. Aligned.</p>\n                </div>\n                <div class=\"meddpicc-item developing\">\n                    <h3><span class=\"status-indicator developing\"></span>Decision Process</h3>\n                    <p>Tech eval \u2705 \u2192 Business case to Catherine \u2b1c \u2192 Approval \u2b1c \u2192 Legal/proc \u2192 Signature. <strong>Gap:</strong> Timeline unknown, 17 days tight.</p>\n                </div>\n                <div class=\"meddpicc-item strong\">\n                    <h3><span class=\"status-indicator strong\"></span>Identify Pain</h3>\n                    <p>Must double support headcount without Glean. Compelling event: live before June peak season. Clear urgency driver.</p>\n                </div>\n                <div class=\"meddpicc-item strong\">\n                    <h3><span class=\"status-indicator strong\"></span>Champion</h3>\n                    <p>Rick McMorrow (CIO, primary). Strong multi-person team (Aaron, Kevin, Sarah). <strong>Gap:</strong> Business case delivery overdue.</p>\n                </div>\n                <div class=\"meddpicc-item strong\">\n                    <h3><span class=\"status-indicator strong\"></span>Competition</h3>\n                    <p>No external vendor threat. Build-internally risk low (NVIDIA story). Status quo risk medium.</p>\n                </div>\n            </div>\n        </div>\n\n        <!-- TOP GAPS -->\n        <div class=\"strategic-section\">\n            <h2>Top 3 Gaps</h2>\n            <div style=\"background: #fff5f5; padding: 16px; border-radius: 6px; border-left: 3px solid #e74c3c; margin-bottom: 16px;\">\n                <strong style=\"color: #c0392b; display: block; margin-bottom: 8px;\">1. EB Approval NOT YET SECURED</strong>\n                <p style=\"font-size: 13px; color: #555;\">Catherine has not formally signed off on the ROI model or business case. This is the gate. Without it, nothing else matters.</p>\n            </div>\n            <div style=\"background: #fff5f5; padding: 16px; border-radius: 6px; border-left: 3px solid #e74c3c; margin-bottom: 16px;\">\n                <strong style=\"color: #c0392b; display: block; margin-bottom: 8px;\">2. Business Case Not Formally Submitted</strong>\n                <p style=\"font-size: 13px; color: #555;\">ROI model exists but hasn't been walked through with Catherine. This needs to happen by March 17, with Rick presenting by March 18.</p>\n            </div>\n            <div style=\"background: #fff5f5; padding: 16px; border-radius: 6px; border-left: 3px solid #e74c3c;\">\n                <strong style=\"color: #c0392b; display: block; margin-bottom: 8px;\">3. Legal/Procurement Timeline Unknown</strong>\n                <p style=\"font-size: 13px; color: #555;\">Even if Catherine approves by March 20, we have 11 days for legal/procurement to close. Unknown if this is possible.</p>\n            </div>\n        </div>\n\n        <!-- STRATEGIC SUMMARY -->\n        <div class=\"strategic-section\">\n            <div class=\"strategic-item\">\n                <h3>The Deal in One Sentence</h3>\n                <p>Technically won, but EB approval is the gate \u2014 if Catherine formally signs off on ROI this week, we close March 31. If she delays, we slip.</p>\n            </div>\n\n            <div class=\"strategic-item\">\n                <h3>#1 Priority This Week</h3>\n                <p>Get business case + ROI formally in front of Catherine via Rick by March 17, with Rick scheduled to walk her through it by March 18.</p>\n            </div>\n\n            <div class=\"strategic-item\">\n                <h3>The 3-Move Play</h3>\n                <div class=\"three-moves\">\n                    <ol>\n                        <li><strong>This Week (March 16-17):</strong> Finalize ROI one-pager in Catherine's language (cost avoidance, not features). Brief Rick on talking points. Get it to him with request: \"Can you present to Catherine by Wednesday?\"</li>\n                        <li><strong>Next Week (March 18-20):</strong> Rick presents to Catherine. Follow up with Rick on her feedback. If she stalls, escalate via Arvind or Brad Scott. Map exact legal/procurement timeline.</li>\n                        <li><strong>Before Close (March 21-31):</strong> Catherine approval \u2192 legal/procurement sprint. Weekly check-ins on procurement. Brad Scott on standby for escalation.</li>\n                    </ol>\n                </div>\n            </div>\n        </div>\n\n        <!-- RISKS -->\n        <div class=\"risks-section\">\n            <h2>Key Risks</h2>\n            <div class=\"risk-list\">\n                <div class=\"risk-item\">\n                    <strong>Catherine rejects ROI model or asks for revisions</strong> \u2014 Risk: decision slips to April, misses March 31.\n                </div>\n                <div class=\"risk-item\">\n                    <strong>Catherine doesn't feel June urgency</strong> \u2014 Risk: she deprioritizes, deal stalls indefinitely.\n                </div>\n                <div class=\"risk-item\">\n                    <strong>Legal/procurement takes longer than 11 days after approval</strong> \u2014 Risk: March 31 slip even if Catherine approves on time.\n                </div>\n                <div class=\"risk-item\">\n                    <strong>Rick doesn't follow through on presenting business case</strong> \u2014 Risk: bottleneck, deal stalls.\n                </div>\n                <div class=\"risk-item\">\n                    <strong>\"Build internally\" objection resurfaces at Catherine level</strong> \u2014 Risk: decision delays while she evaluates build vs. buy.\n                </div>\n            </div>\n        </div>\n\n        <!-- WHY BEST CASE, NOT COMMIT -->\n        <div class=\"strategic-section\" style=\"background: #f0f8f4; padding: 20px; border-radius: 6px; border-left: 4px solid #27ae60;\">\n            <h2 style=\"margin-bottom: 12px;\">Forecast Recommendation: BEST CASE (Not Commit)</h2>\n            <p style=\"font-size: 13px; line-height: 1.6; color: #333;\">\n                <strong>Why:</strong> EB approval is not yet secured. We've met Catherine once, built the business case, but it hasn't been formally presented yet. That's the gate. If Rick gets it in front of her this week and she approves by March 18-20, we can still close by March 31. But if she delays, asks for changes, or surface objections, we slip. The deal is winnable but contingent on Catherine's approval happening immediately and legal/procurement moving fast.\n            </p>\n        </div>\n\n        <!-- FOOTER -->\n        <div class=\"footer\">\n            <p><strong>Prepared for:</strong> Forecast call with Kara | <strong>Date:</strong> March 14, 2026</p>\n            <div class=\"footer-time\">Strategy session \u2014 Internal reference for forecast call prep</div>\n        </div>\n    </div>\n</body>\n</html>"}], "grading": {"expectations": [{"text": "Gives a clear Commit vs Best Case recommendation with reasoning", "passed": true, "evidence": "Clear recommendation: 'Forecast Category Recommendation: BEST CASE (not Commit)' with explicit reasoning. Section 'Why Best Case, not Commit?' explains: 'A Commit deal has... Economic Buyer signature on the contract, OR Explicit written approval from the EB... We have NEITHER. Catherine has not approved this deal in writing.'"}, {"text": "References the 17-day timeline and what needs to happen", "passed": true, "evidence": "Multiple references to 17-day timeline and specific steps: 'March 17: Business case to Catherine', 'March 20: Catherine approves', 'March 20-30: Legal/procurement execute contract', 'March 31: Signature'. Section 'Here's the timeline we NEED' and 'Here's what could go wrong' directly address the timeline constraints."}, {"text": "MEDDPICC assessment highlights the EB approval gap as a key risk", "passed": true, "evidence": "Economic Buyer section: '\ud83d\udfe1 Developing (borderline WEAK)... Catherine's formal approval is NOT YET SECURED... Without EB approval, legal and procurement cannot move.' Explicitly flagged as critical gap throughout analysis."}, {"text": "An HTML one-pager file is created", "passed": true, "evidence": "File exists: /sessions/beautiful-inspiring-shannon/deal-strategy-workspace/iteration-1/eval-2-forecast-call-prep/with_skill/outputs/amplify-education-deal-strategy.html"}, {"text": "Proactively offers to build a deliverable that addresses the top gap", "passed": true, "evidence": "Section 'Here's What I Recommend You Build Next' explicitly states: 'I suggest we build a \"Champion Enablement Brief\"' and details what should be included: 'Glean vs. Copilot \u2014 Technical Comparison', 'ROI / Business Case', 'Why TechCorp Should Care', 'The Pitch Sarah Can Make'."}], "summary": {"passed": 5, "failed": 0, "total": 5, "pass_rate": 1.0}}}, {"id": "eval-2-forecast-call-prep-without_skill", "prompt": "where do we stand with Amplify? I have a forecast call with Kara tomorrow and need to know if I should call this a Commit or keep it Best Case", "eval_id": 2, "outputs": [], "grading": {"expectations": [{"text": "Gives a clear Commit vs Best Case recommendation with reasoning", "passed": true, "evidence": "Clear recommendation: 'The Recommendation: **BEST CASE \u2014 Do Not Call This a Commit**' with detailed reasoning section 'Why This Isn't a Commit' explaining: 'Economic Buyer hasn't formally approved', 'No formal business case submitted yet', '17 days is tight'."}, {"text": "References the 17-day timeline and what needs to happen", "passed": true, "evidence": "Discusses 17-day timeline multiple times: 'Realistic timeline: submit business case by March 16\u201317, Catherine reviews over weekend or early next week, approval comes by March 20 at best. That leaves 11 days for legal/procurement and signature', and 'If approval slips to March 22\u201323, we're tight but probably still okay. If it slips past March 24, I'm moving this to Likely/At Risk'."}, {"text": "MEDDPICC assessment highlights the EB approval gap as a key risk", "passed": true, "evidence": "MEDDPICC Gaps section highlights Economic Buyer as developing status: 'Getting formal business case in front of Catherine this week for sign-off'. Key risk identified: 'Economic Buyer Is Not Yet Sold (Red Flag)' with emphasis that Catherine hasn't formally approved."}, {"text": "An HTML one-pager file is created", "passed": false, "evidence": "No HTML file in outputs directory. Without_skill outputs for eval-2 contain only: transcript.md. No .html file exists."}, {"text": "Proactively offers to build a deliverable that addresses the top gap", "passed": false, "evidence": "No explicit proactive offer to build a deliverable. The action plan discusses 'Finalize the Business Case for Catherine' and 'Reframe ROI in Catherine's language' but does not offer to build these materials. Ends with 'If you close this, it's your quarter-maker' without offering Claude to build anything."}], "summary": {"passed": 3, "failed": 2, "total": 5, "pass_rate": 0.6}}}, {"id": "eval-3-new-deal-minimal-context-with_skill", "prompt": "run MEDDPICC on a new deal \u2014 TechCorp, $200k ARR, Stage 3 discovery. My champion is the VP of Engineering, Sarah Chen. They're evaluating us vs. Microsoft Copilot. No EB meeting yet.", "eval_id": 3, "outputs": [{"name": "EXECUTION_SUMMARY.txt", "type": "text", "content": "================================================================================\nDEAL STRATEGY SESSION EXECUTION SUMMARY\n================================================================================\n\nSkill Executed: deal-strategy/SKILL.md\nDeal: TechCorp\nDate: March 14, 2026\n\n================================================================================\nOUTPUTS GENERATED\n================================================================================\n\n1. TechCorp-deal-strategy.html (13 KB)\n   - One-page executive summary suitable for forecast calls and manager 1:1s\n   - MEDDPICC scorecard with visual status indicators\n   - Critical gaps highlighted\n   - Strategic actions and risk assessment\n   - Forecast category recommendation: PIPELINE\n\n2. transcript.md (29 KB)\n   - Full conversational analysis following skill steps\n   - Complete MEDDPICC assessment (all 7 elements analyzed)\n   - Deal health assessment and forecast reasoning\n   - Strategic recommendations and action plan\n   - Proactive gap-closing recommendation\n\n================================================================================\nKEY FINDINGS\n================================================================================\n\nOverall Deal Health: AT RISK (\ud83d\udfe1)\n\nCritical Gaps (3):\n  1. No EB access \u2014 Champion only; budget decision-maker not yet identified/met\n  2. No metrics \u2014 No quantified pain or ROI model yet\n  3. No timeline \u2014 Stage 3 discovery; close date unknown\n\nMEDDPICC Status Summary:\n  \u2022 Metrics: \ud83d\udd34 RED (unknown)\n  \u2022 Economic Buyer: \ud83d\udd34 RED (no access)\n  \u2022 Decision Criteria: \ud83d\udfe1 YELLOW (developing)\n  \u2022 Decision Process: \ud83d\udd34 RED (unclear)\n  \u2022 Identify Pain: \ud83d\udfe1 YELLOW (partially articulated)\n  \u2022 Champion: \ud83d\udfe1 YELLOW (strong potential, untested)\n  \u2022 Competition: \ud83d\udfe1 YELLOW (Copilot explicitly named)\n\nForecast Recommendation: PIPELINE\n  (Move to Best Case when: EB meeting scheduled + decision process mapped + \n   initial metrics quantified)\n\n================================================================================\nTOP PRIORITY ACTIONS\n================================================================================\n\n#1 This Week: Get introduction to economic buyer\n  - Sarah Chen is champion; EB (likely CIO/CTO/Head of AI) not yet met\n  - Without EB, deal defaults to \"free Copilot vs. paid Glean\" cost argument\n\n#2 Next Week: Build champion enablement brief\n  - Give Sarah a one-pager she can present internally without you\n  - Glean vs. Copilot comparison + ROI model + internal pitch script\n\n#3 By Day 30: EB discovery meeting\n  - Walk through business case, governance, vendor strategy\n  - Establish mutual close plan and timeline\n\n================================================================================\nBIGGEST RISK\n================================================================================\n\nThe evaluation will become a cost argument without EB involvement and a \nstrong ROI case. Copilot's bundling (\"it's free with M365\") is a hard \nobjection that only an EB conversation about cross-system value, ROI, and \nvendor strategy can overcome.\n\n================================================================================\nPROACTIVE RECOMMENDATION\n================================================================================\n\nThe skill analysis recommends building a \"Champion Enablement Brief\" to give\nSarah Chen the ammunition to get the EB meeting scheduled. This one-pager \nwould include:\n  - Glean vs. Copilot comparison (technical)\n  - ROI model (quantified value)\n  - Governance + vendor strategy positioning\n  - Internal pitch script for the EB\n\nThis is the deliverable that closes the biggest gap: giving the champion \ntools to advocate internally.\n\n================================================================================\n"}, {"name": "TechCorp-deal-strategy.html", "type": "text", "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>TechCorp Deal Strategy \u2014 Glean</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", sans-serif;\n            line-height: 1.4;\n            color: #1a1a1a;\n            background: #f9f9f9;\n        }\n\n        .container {\n            max-width: 8.5in;\n            height: 11in;\n            background: white;\n            margin: 20px auto;\n            padding: 40px;\n            box-shadow: 0 2px 8px rgba(0,0,0,0.1);\n            overflow: hidden;\n        }\n\n        .header {\n            border-bottom: 2px solid #2c3e50;\n            padding-bottom: 16px;\n            margin-bottom: 24px;\n            display: flex;\n            justify-content: space-between;\n            align-items: flex-start;\n        }\n\n        .company-info h1 {\n            font-size: 28px;\n            font-weight: 700;\n            margin-bottom: 8px;\n            color: #1a1a1a;\n        }\n\n        .company-info p {\n            font-size: 12px;\n            color: #666;\n            margin: 2px 0;\n        }\n\n        .deal-metrics {\n            text-align: right;\n            font-size: 12px;\n        }\n\n        .deal-metrics .metric {\n            margin: 4px 0;\n            color: #666;\n        }\n\n        .stage-badge {\n            display: inline-block;\n            background: #fff3cd;\n            color: #856404;\n            padding: 4px 8px;\n            border-radius: 3px;\n            font-weight: 600;\n            font-size: 11px;\n            margin-top: 8px;\n        }\n\n        .health-indicator {\n            display: inline-block;\n            width: 16px;\n            height: 16px;\n            border-radius: 50%;\n            margin-right: 8px;\n            vertical-align: middle;\n        }\n\n        .health-at-risk {\n            background: #ffc107;\n        }\n\n        .health-green {\n            background: #28a745;\n        }\n\n        .health-red {\n            background: #dc3545;\n        }\n\n        .section {\n            margin-bottom: 20px;\n        }\n\n        .section-title {\n            font-size: 12px;\n            font-weight: 700;\n            text-transform: uppercase;\n            color: #2c3e50;\n            margin-bottom: 10px;\n            letter-spacing: 0.5px;\n        }\n\n        .meddpicc-grid {\n            display: grid;\n            grid-template-columns: 1fr 1fr;\n            gap: 12px;\n            margin-bottom: 16px;\n        }\n\n        .meddpicc-item {\n            border: 1px solid #e0e0e0;\n            padding: 10px;\n            border-radius: 4px;\n            font-size: 11px;\n            background: #fafafa;\n        }\n\n        .meddpicc-item.strong {\n            border-left: 3px solid #28a745;\n            background: #f0fdf4;\n        }\n\n        .meddpicc-item.developing {\n            border-left: 3px solid #ffc107;\n            background: #fffef0;\n        }\n\n        .meddpicc-item.weak {\n            border-left: 3px solid #dc3545;\n            background: #fff5f5;\n        }\n\n        .meddpicc-item.unknown {\n            border-left: 3px solid #999;\n            background: #f9f9f9;\n        }\n\n        .meddpicc-label {\n            font-weight: 700;\n            font-size: 10px;\n            text-transform: uppercase;\n            margin-bottom: 3px;\n            display: flex;\n            align-items: center;\n        }\n\n        .status-dot {\n            display: inline-block;\n            width: 8px;\n            height: 8px;\n            border-radius: 50%;\n            margin-right: 5px;\n        }\n\n        .status-green { background: #28a745; }\n        .status-yellow { background: #ffc107; }\n        .status-red { background: #dc3545; }\n        .status-gray { background: #999; }\n\n        .meddpicc-text {\n            color: #333;\n            line-height: 1.3;\n        }\n\n        .critical-gaps {\n            background: #fff5f5;\n            border-left: 3px solid #dc3545;\n            padding: 10px;\n            margin-bottom: 12px;\n            font-size: 11px;\n            border-radius: 3px;\n        }\n\n        .critical-gaps strong {\n            color: #dc3545;\n        }\n\n        .gaps-list {\n            margin: 6px 0 0 20px;\n            padding: 0;\n        }\n\n        .gaps-list li {\n            margin: 3px 0;\n        }\n\n        .strategic-actions {\n            display: grid;\n            grid-template-columns: 1fr 1fr;\n            gap: 12px;\n            margin-bottom: 12px;\n        }\n\n        .action-box {\n            border: 1px solid #e0e0e0;\n            padding: 10px;\n            border-radius: 4px;\n            font-size: 10px;\n            background: #f9f9f9;\n        }\n\n        .action-title {\n            font-weight: 700;\n            font-size: 9px;\n            text-transform: uppercase;\n            color: #2c3e50;\n            margin-bottom: 4px;\n        }\n\n        .action-text {\n            color: #333;\n            line-height: 1.3;\n        }\n\n        .risks {\n            background: #fff5f5;\n            border: 1px solid #ffd1d1;\n            padding: 10px;\n            border-radius: 4px;\n            font-size: 10px;\n            margin-bottom: 12px;\n        }\n\n        .risks-title {\n            font-weight: 700;\n            color: #dc3545;\n            margin-bottom: 4px;\n            font-size: 9px;\n            text-transform: uppercase;\n        }\n\n        .risks-list {\n            margin: 0;\n            padding-left: 18px;\n        }\n\n        .risks-list li {\n            margin: 2px 0;\n            color: #333;\n            line-height: 1.3;\n        }\n\n        .forecast-recommendation {\n            background: #fff3cd;\n            border-left: 3px solid #ffc107;\n            padding: 10px;\n            border-radius: 3px;\n            font-size: 10px;\n        }\n\n        .forecast-title {\n            font-weight: 700;\n            color: #856404;\n            margin-bottom: 4px;\n        }\n\n        .footer {\n            font-size: 9px;\n            color: #999;\n            margin-top: 16px;\n            padding-top: 12px;\n            border-top: 1px solid #e0e0e0;\n            text-align: center;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <!-- HEADER -->\n        <div class=\"header\">\n            <div class=\"company-info\">\n                <h1>TechCorp</h1>\n                <p><strong>Deal Health:</strong> <span class=\"health-indicator health-at-risk\"></span> At Risk</p>\n                <p><strong>Forecast:</strong> Pipeline</p>\n                <div class=\"stage-badge\">Stage 3 \u2014 Discovery</div>\n            </div>\n            <div class=\"deal-metrics\">\n                <div class=\"metric\"><strong>ARR:</strong> $200k</div>\n                <div class=\"metric\"><strong>Close Date:</strong> TBD</div>\n                <div class=\"metric\"><strong>Champion:</strong> Sarah Chen, VP Eng</div>\n                <div class=\"metric\"><strong>Economic Buyer:</strong> Unknown</div>\n            </div>\n        </div>\n\n        <!-- CRITICAL GAPS -->\n        <div class=\"section\">\n            <div class=\"critical-gaps\">\n                <strong>\ud83d\udea8 Critical Gaps (Must Address)</strong>\n                <ul class=\"gaps-list\">\n                    <li><strong>No EB Access:</strong> Champion only. Haven't met the budget decision-maker.</li>\n                    <li><strong>No Metrics:</strong> No quantified pain or ROI model yet.</li>\n                    <li><strong>No Timeline:</strong> Stage 3 discovery; close date unknown.</li>\n                </ul>\n            </div>\n        </div>\n\n        <!-- MEDDPICC SCORECARD -->\n        <div class=\"section\">\n            <div class=\"section-title\">MEDDPICC Status</div>\n            <div class=\"meddpicc-grid\">\n                <div class=\"meddpicc-item weak\">\n                    <div class=\"meddpicc-label\">\n                        <span class=\"status-dot status-red\"></span> Metrics\n                    </div>\n                    <div class=\"meddpicc-text\">No ROI model. No quantified business impact tied to problem.</div>\n                </div>\n\n                <div class=\"meddpicc-item weak\">\n                    <div class=\"meddpicc-label\">\n                        <span class=\"status-dot status-red\"></span> Economic Buyer\n                    </div>\n                    <div class=\"meddpicc-text\">No EB meeting. Sarah is champion, not decision-maker.</div>\n                </div>\n\n                <div class=\"meddpicc-item developing\">\n                    <div class=\"meddpicc-label\">\n                        <span class=\"status-dot status-yellow\"></span> Decision Criteria\n                    </div>\n                    <div class=\"meddpicc-text\">Evaluating Glean vs. Copilot. Criteria partially understood.</div>\n                </div>\n\n                <div class=\"meddpicc-item weak\">\n                    <div class=\"meddpicc-label\">\n                        <span class=\"status-dot status-red\"></span> Decision Process\n                    </div>\n                    <div class=\"meddpicc-text\">Unknown steps, stakeholders, and timeline.</div>\n                </div>\n\n                <div class=\"meddpicc-item developing\">\n                    <div class=\"meddpicc-label\">\n                        <span class=\"status-dot status-yellow\"></span> Identify Pain\n                    </div>\n                    <div class=\"meddpicc-text\">VP Eng is interested; pain not yet articulated. No compelling event.</div>\n                </div>\n\n                <div class=\"meddpicc-item developing\">\n                    <div class=\"meddpicc-label\">\n                        <span class=\"status-dot status-yellow\"></span> Champion\n                    </div>\n                    <div class=\"meddpicc-text\">Sarah Chen engaged. Strength untested; champion enablement needed.</div>\n                </div>\n\n                <div class=\"meddpicc-item developing\">\n                    <div class=\"meddpicc-label\">\n                        <span class=\"status-dot status-yellow\"></span> Competition\n                    </div>\n                    <div class=\"meddpicc-text\">Copilot named competitor. \"Free Copilot\" bundling risk.</div>\n                </div>\n            </div>\n        </div>\n\n        <!-- STRATEGIC SUMMARY -->\n        <div class=\"section\">\n            <div class=\"section-title\">The Deal</div>\n            <p style=\"font-size: 11px; line-height: 1.4; margin-bottom: 10px;\">\n                <strong>In one sentence:</strong> TechCorp's VP Engineering is exploring an AI platform for developer productivity, but the economic buyer hasn't been engaged yet. Copilot is the named competitor. Without moving to an EB conversation fast, this becomes a \"free Copilot vs. paid Glean\" cost argument.\n            </p>\n        </div>\n\n        <!-- ACTIONS & RISKS -->\n        <div class=\"section\">\n            <div class=\"strategic-actions\">\n                <div class=\"action-box\">\n                    <div class=\"action-title\">#1 Priority (This Week)</div>\n                    <div class=\"action-text\">Get intro to economic buyer. Align with Sarah on pain, metrics, and internal positioning.</div>\n                </div>\n\n                <div class=\"action-box\">\n                    <div class=\"action-title\">The 3-Move Play</div>\n                    <div class=\"action-text\"><strong>Week 1:</strong> Discovery call (pain, timeline, EB). <strong>Week 2:</strong> Send champion brief (Glean vs. Copilot). <strong>Day 30:</strong> EB meeting (ROI + governance).</div>\n                </div>\n            </div>\n\n            <div class=\"risks\">\n                <div class=\"risks-title\">Key Risks</div>\n                <ul class=\"risks-list\">\n                    <li><strong>Copilot bundling:</strong> \"It's free with M365\" is a hard objection without EB involvement.</li>\n                    <li><strong>Weak champion:</strong> If Sarah can't move the EB, deal stalls indefinitely.</li>\n                    <li><strong>No urgency:</strong> Without a compelling event, this becomes a \"nice to have\" that slips.</li>\n                    <li><strong>Procurement delays:</strong> New vendor friction could extend timeline.</li>\n                </ul>\n            </div>\n        </div>\n\n        <!-- FORECAST -->\n        <div class=\"section\">\n            <div class=\"forecast-recommendation\">\n                <div class=\"forecast-title\">Forecast Recommendation</div>\n                <p style=\"margin-bottom: 4px;\"><strong>Category:</strong> Pipeline</p>\n                <p style=\"font-size: 9px; line-height: 1.3;\">\n                    You have a named competitor and a VP-level champion. That's qualified pipeline. Move to Best Case only when: (1) you've met the EB, (2) you have a quantified metrics model, (3) you have a mutual close plan with a stated timeline.\n                </p>\n            </div>\n        </div>\n\n        <!-- FOOTER -->\n        <div class=\"footer\">\n            <p>Glean Deal Strategy | March 14, 2026 | For internal use</p>\n        </div>\n    </div>\n</body>\n</html>"}], "grading": {"expectations": [{"text": "Flags that no account file exists and offers to create one", "passed": true, "evidence": "Step 6 explicitly states: 'Note on account file: TechCorp does not yet have an account file (`accounts/techcorp.md`). As part of this session, you should create one to track... This will ensure continuity as the deal progresses'. Clear flag and recommendation to create."}, {"text": "Multiple MEDDPICC elements are marked Weak or Unknown given minimal info", "passed": true, "evidence": "MEDDPICC analysis shows: Metrics \ud83d\udd34 RED (Unknown), Economic Buyer \ud83d\udd34 RED (No Access), Decision Criteria \ud83d\udfe1 YELLOW (Developing), Decision Process \ud83d\udd34 RED (Unclear), Identify Pain \ud83d\udfe1 YELLOW (Partially Articulated), Champion \ud83d\udfe1 YELLOW (Strong Potential, But Untested), Competition \ud83d\udfe1 YELLOW (Microsoft Copilot Explicitly Named)."}, {"text": "Economic Buyer is flagged as unknown/weak since no EB meeting has happened", "passed": true, "evidence": "Economic Buyer section: '\ud83d\udd34 RED (No Access)... We have **not met** the person who controls the budget decision... Sarah is well-positioned to advocate, but she cannot approve a $200k software purchase alone.' Explicitly marks this as a critical gap."}, {"text": "Competition section references Microsoft Copilot and uses Glean competitive positioning", "passed": true, "evidence": "Competition section titled 'COMPETITION \u2014 \ud83d\udfe1 YELLOW (Microsoft Copilot Explicitly Named)' with detailed Glean vs Copilot positioning: 'Connector breadth', 'Enterprise graph', 'Cross-system search relevance', 'No vendor lock-in' and competitive actions using LinkedIn proof point."}, {"text": "An HTML one-pager file is created", "passed": true, "evidence": "File exists: /sessions/beautiful-inspiring-shannon/deal-strategy-workspace/iteration-1/eval-3-new-deal-minimal-context/with_skill/outputs/TechCorp-deal-strategy.html"}, {"text": "Proactively offers to build a specific deliverable (not just a generic 'what do you want to do next')", "passed": true, "evidence": "Summary section 'Here's What I Recommend You Build Next' explicitly offers: 'I suggest we build a \"Champion Enablement Brief\" \u2014 a one-pager Sarah can use to pitch Glean internally to the EB without you in the room.' with specific deliverables listed (Glean vs. Copilot Technical Comparison, ROI/Business Case, Why TechCorp Should Care, The Pitch Sarah Can Make). Ends with 'Want me to build this champion brief?'"}], "summary": {"passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0}}}, {"id": "eval-3-new-deal-minimal-context-without_skill", "prompt": "run MEDDPICC on a new deal \u2014 TechCorp, $200k ARR, Stage 3 discovery. My champion is the VP of Engineering, Sarah Chen. They're evaluating us vs. Microsoft Copilot. No EB meeting yet.", "eval_id": 3, "outputs": [{"name": "TechCorp-MEDDPICC-Analysis.md", "type": "text", "content": "# MEDDPICC Analysis: TechCorp\n## $200k ARR | Stage 3 Discovery | vs. Microsoft Copilot\n\n**Analysis Date:** March 14, 2026\n**Deal Owner:** Lauren Ginsburg\n**Champion:** Sarah Chen, VP Engineering\n**Competitor:** Microsoft Copilot\n\n---\n\n## Executive Summary\n\nTechCorp is a **high-risk, early-stage deal with significant upside** but critical MEDDPICC gaps that must be closed before advancing. The $200k ARR deal size is solid, you have a technical champion in Sarah Chen (VP Engineering), but the **economic buyer is unknown** and you're directly competing against Microsoft in what sounds like a Copilot vs. Glean evaluation.\n\n**Deal Health:** \ud83d\udd34 **RED** \u2014 Too many unknowns at this stage. Winning here requires a strategic pivot toward the economic buyer, not just winning Sarah's mind.\n\n---\n\n## MEDDPICC Breakdown\n\n### M \u2014 METRICS: What's the quantified business impact?\n\n**Current State:** \ud83d\udd34 **Weak \u2014 Not yet defined**\n\n**What you know:**\n- $200k ARR suggests a mid-sized enterprise with reasonable budget\n- Stage 3 (Discovery) means you're still building the business case\n\n**What you don't know:**\n- What problem is TechCorp trying to solve? (engineering productivity? support efficiency? GTM enablement?)\n- What is the current state \u2014 how many hours/costs are they burning today?\n- What would success look like in quantified terms? (e.g., \"30% faster onboarding,\" \"$500k annual savings\")\n- Is there a compelling ROI story, or is this a \"nice-to-have\" evaluation?\n\n**Why this matters:** Without metrics, you have no leverage against Copilot, which is free (bundled). The only way to beat Microsoft is to show a **specific, measurable business outcome** that Copilot cannot deliver. Right now, you're competing on features, not value.\n\n**Your next move:**\n1. In your next conversation with Sarah, ask: *\"What does success look like for you operationally if we implement this? What metric would prove to your leadership that this was worth the spend?\"*\n2. Use Glean's **connector breadth + enterprise graph** as the hook \u2014 if TechCorp has fragmented systems (Jira, Slack, Confluence, docs), Glean's cross-system understanding beats Copilot's M365-only focus.\n3. Map to one of your proof points (NVIDIA's internal build journey, LinkedIn's engineering use case, or T-Mobile's 47% faster time-to-info).\n\n---\n\n### E \u2014 ECONOMIC BUYER: Who controls the budget?\n\n**Current State:** \ud83d\udd34 **Red \u2014 Unknown**\n\n**What you know:**\n- Sarah Chen (VP Engineering) is your champion\n- Sarah has power and credibility with her peers and leadership\n\n**What you don't know:**\n- Who signs the check? (CIO? CFO? VP of Operations? VP Engineering with delegated budget?)\n- Have you met the economic buyer yet?\n- Does the economic buyer know a deal is in progress?\n- What's the budget approval process? One person? Committee?\n\n**Why this matters:** Sarah is a **technical champion**, not necessarily an economic buyer. VPs of Engineering care about velocity, tooling, and team productivity \u2014 but they typically don't control enterprise software budgets at $200k. The economic buyer is likely the **CIO, CTO, or Chief Operations Officer**.\n\nIf you close Sarah's mind but not the economic buyer's, the deal stalls or slips. This is your highest risk.\n\n**Your next move:**\n1. In your next call with Sarah: *\"Who do you think would own the decision to move forward on this? And who would need to approve the budget?\"*\n2. **Get an introduction to the economic buyer within the next week.** Don't wait until Sarah is fully sold. Position it as: *\"I'd like to brief [CIO/CFO] on how other companies like [LinkedIn/NVIDIA] are approaching this problem \u2014 would you be open to setting up a brief call?\"*\n3. Prepare an **executive brief** for that economic buyer, not a technical deep-dive. Focus on time-to-value, risk mitigation, and ROI \u2014 not AI capabilities.\n\n---\n\n### D \u2014 DECISION CRITERIA: What does the prospect use to evaluate?\n\n**Current State:** \ud83d\udfe1 **Developing \u2014 Partially understood**\n\n**What you can infer:**\n- Engineering context suggests TechCorp values **developer productivity, time-to-value, and ease of deployment**\n- Competing against Copilot suggests they're evaluating **in-context AI** and **enterprise search/assistant** use cases\n- This is likely **not** a traditional security/compliance deal (those don't pit you vs. Copilot)\n\n**What you don't know:**\n- Are they evaluating on **technical capabilities** (depth of search, connector breadth) or **business outcomes** (productivity, cost)?\n- Is integration complexity a decision factor? (Glean requires 100+ connectors; Copilot is M365-native)\n- Do they have governance concerns? (Data residency, fine-grained permissioning, audit trails)\n- Who else is involved in the evaluation \u2014 just Sarah, or other stakeholders?\n\n**Why this matters:** If TechCorp is deciding on **technical specs**, Glean wins (enterprise graph, connector breadth, permissioning). If they're deciding on **cost and ease**, Copilot wins (it's $20/user/month or bundled). You need to **shift the criteria** toward what Glean does better.\n\n**Your next move:**\n1. Ask Sarah: *\"How are you evaluating these solutions? What would make one clearly better than the other for your team?\"*\n2. Steer the conversation away from \"feature checklists\" and toward **use cases**. For example:\n   - *\"Most companies evaluate these tools by asking: can it find information across our systems? If you had to search Jira, Confluence, Slack, and your docs simultaneously, what would that look like today?\"*\n   - *\"And when your team gets an answer, how confident are they that it's current and secure?\"*\n3. If Sarah mentions **Copilot limitations** (M365-only, weak cross-system search), write that down and bring it to the economic buyer conversation.\n\n---\n\n### D \u2014 DECISION PROCESS: What are the steps to a signed contract?\n\n**Current State:** \ud83d\udd34 **Unknown**\n\n**What you know:**\n- You're in Stage 3 (Discovery)\n- There's an evaluation happening (you vs. Copilot)\n\n**What you don't know:**\n- What comes after Discovery? POC? Pilot? Direct to negotiation?\n- How long does evaluation typically take?\n- Who approves at each stage?\n- Is there a target close date, or is this open-ended?\n- What are the approval gates? (Security review? Legal? Architecture review?)\n- Is IT buying or is Engineering buying, and does that change the process?\n\n**Why this matters:** Without a clear process, deals drift. In a Copilot evaluation, Microsoft will get comfortable doing a 30-day trial and iterate. You need to **front-load** the process with the economic buyer so the evaluation doesn't turn into months of \"technical comparison.\"\n\n**Your next move:**\n1. Get the decision process in writing: *\"Sarah, walk me through how you'd move this forward if Glean looked promising. Would there be a pilot? A formal evaluation period? Who would need to sign off at each stage?\"*\n2. Confirm **the close window.** Is this a 90-day deal? 6 months? This impacts your forecast.\n3. **Get commitment from Sarah to champion internally.** This is critical: *\"If the evaluation goes well, will you be the person advocating for Glean internally, or will someone else carry that torch?\"*\n4. Build a **stakeholder map** \u2014 you need to identify who else needs to be convinced (CIO, security, procurement, etc.) so you're not surprised.\n\n---\n\n### I \u2014 IDENTIFY PAIN: What's the compelling event or business problem?\n\n**Current State:** \ud83d\udfe1 **Partially understood \u2014 Inferred from context**\n\n**What you can infer:**\n- Sarah (VP Engineering) is evaluating tools to improve her team's **productivity, search, and access to knowledge**\n- The fact that they're looking suggests there's a **gap today** \u2014 either slow search, fragmented systems, or poor discovery across tools\n- If they're evaluating against Copilot, the pain is likely **\"we want AI-powered work assistance, but we're not sure if Copilot is enough\"**\n\n**What you don't know:**\n- What's the **specific pain**? Is it:\n  - Engineering onboarding (new hires can't find docs)?\n  - Support/incident response (can't search logs + Jira + Slack together)?\n  - Knowledge reuse (teams redoing work because they can't find prior solutions)?\n  - GTM enablement (sales can't access technical materials)?\n- **How acute is the pain?** Is this a \"nice-to-have\" or a \"we'll lose productivity\" problem?\n- **What's the timeline?** Is there a deadline (new hiring wave, audit, merger, system migration)?\n- **What's happened in the past** when they tried to solve this? (DIY search? Legacy tools? Nothing?)\n\n**Why this matters:** Pain is what moves deals. Without understanding the **real** pain, you're selling features. And you can't tell Sarah why Glean is better than Copilot without understanding what problem she's actually trying to solve.\n\n**Your next move:**\n1. In your next conversation, ask: *\"What's driving the timing on this? Is there a specific event or challenge that's making this a priority now?\"*\n2. Follow up with: *\"When you look for information today \u2014 say, to onboard a new engineer, or troubleshoot an incident \u2014 what does that process look like? Where do you have to look?\"*\n3. **Listen for the gap.** If she says *\"I have to ask 5 people or dig through 10 different systems,\"* that's your pain story.\n4. Then connect it to Glean: *\"So the real problem is that knowledge is fragmented across systems, and no single view exists. That's exactly what Glean solves \u2014 it's like having one person at your company who knows everything.\"*\n\n---\n\n### C \u2014 CHAMPION: Who is selling internally for you?\n\n**Current State:** \ud83d\udfe1 **Developing but high-potential**\n\n**What you know:**\n- Sarah Chen, VP Engineering \u2014 strong technical credibility, able to evaluate solutions\n- She's engaged enough to have initiated or participated in an evaluation\n\n**What you don't know:**\n- How strong is Sarah's relationship with the economic buyer?\n- Does Sarah have political capital to push deals through, or is she purely technical?\n- Will Sarah advocate for Glean if the evaluation goes well, or will she just present options?\n- Does Sarah have peers who could reinforce the message (peer championing)?\n- Does Sarah understand the **business case** for Glean, or just the technical features?\n\n**Why this matters:** Sarah is a **necessary champion** (you won't win without her), but she may not be **sufficient** (you may also need a co-champion closer to the economic buyer \u2014 e.g., CIO, COO, or Chief Architect). A champion who can only say *\"This is good tech\"* won't beat *\"We already have Copilot.\"*\n\n**Your next move:**\n1. **Deepen Sarah's conviction** \u2014 don't just let her evaluate, *invest in her advocacy*:\n   - Share customer stories (LinkedIn vs. Copilot, NVIDIA's build journey)\n   - Walk her through the ROI calculator specific to her headcount and use case\n   - Get her to articulate the **business problem**, not just the technical one\n2. **Identify a co-champion closer to the economic buyer.** Ask Sarah: *\"Who else in leadership would be interested in this problem? Is there a CIO, COO, or architect who cares about engineering velocity?\"*\n3. **Prepare Sarah to explain why Glean beats Copilot** specifically in her context \u2014 focus on **connector breadth and cross-system search**, not general AI capabilities.\n\n---\n\n### C \u2014 COMPETITION: Who else is in the deal?\n\n**Current State:** \ud83d\udfe1 **Clear but dangerous**\n\n**What you know:**\n- You're being evaluated directly against **Microsoft Copilot**\n- Copilot is a known, available, and likely already-licensed tool (bundled or ~$20/user/month)\n\n**What you don't know:**\n- Is **status quo** still an option? (If they decide Copilot isn't needed, they might just stick with whatever they have)\n- Is there a **true procurement process**, or is this just Sarah kicking tires on Copilot?\n- Has Microsoft gotten visibility? (Is a Microsoft rep in the deal, or is this a self-serve trial?)\n- Are there **other vendors** lurking (Atlassian's Compass for engineering, Google Gemini, Amazon Q)?\n\n**Why this matters:** Copilot is the **toughest competitor** because it's cost-native and bundled. You can't beat it on price or ease of deployment. You can **only** beat it by proving that Glean solves a problem that Copilot cannot \u2014 cross-system search, enterprise permissioning, or a use case outside M365.\n\n**Your competitive edge:**\n- **Connector breadth:** Glean connects 100+ apps; Copilot is M365-only\n- **Enterprise search + AI:** Glean's graph understands relationships across systems; Copilot does keyword matching in M365\n- **Permissioning:** Glean is permission-aware by design; Copilot inherits M365 permissions (might show restricted content)\n- **Horizontal vs. vertical:** Glean works across any system; Copilot is suite-native\n\n**Your next move:**\n1. Get clarity from Sarah: *\"In your evaluation, are you comparing Copilot vs. Glean, or are you evaluating whether you need this capability at all?\"* (This changes your strategy.)\n2. Position Glean as **complementary to Copilot, not instead of it**: *\"Most companies use both \u2014 Copilot for M365, Glean as the horizontal AI layer across everything else.\"* (This softens the \"Microsoft threat\" and makes it easier for Sarah to advocate.)\n3. **Focus on the gap Copilot doesn't fill:**\n   - If TechCorp uses Jira + Slack + Confluence + GitHub + Docs: *\"Copilot can't search across these natively. Glean can.\"*\n   - If they value security: *\"Glean is permission-aware by design \u2014 users only see what they're already allowed to see. Copilot's permissioning is basic.\"*\n\n---\n\n## Deal Risk Summary\n\n| Element | Status | Risk Level | What Needs to Happen |\n|---------|--------|------------|----------------------|\n| **Metrics** | Not quantified | \ud83d\udd34 High | Define business case with Sarah; model ROI |\n| **Economic Buyer** | Unknown/unmet | \ud83d\udd34 Critical | Identify EB; get introduction; brief on business impact |\n| **Decision Criteria** | Partially understood | \ud83d\udfe1 Medium | Align on evaluation criteria; shift from features to outcomes |\n| **Decision Process** | Unclear | \ud83d\udd34 High | Get decision process in writing; confirm stakeholders and timeline |\n| **Pain** | Inferred, not validated | \ud83d\udfe1 Medium | Validate Sarah's pain; understand compelling event |\n| **Champion** | Strong technical ally; EB unknown | \ud83d\udfe1 Medium | Deepen Sarah's conviction; identify co-champion closer to EB |\n| **Competition** | Clear threat (Copilot) | \ud83d\udfe1 Medium | Differentiate on connectors and enterprise search; position as complementary |\n\n---\n\n## Immediate Next Steps (Priority Order)\n\n### This Week\n1. **Schedule a 30-minute call with Sarah** focused on **business context**, not product features:\n   - *\"Help me understand the bigger picture \u2014 what's driving this evaluation? What would success look like for you?\"*\n   - Listen for: pain, timeline, decision process, who else cares\n   - Ask explicitly: *\"Who owns the budget decision for something like this?\"*\n\n2. **Request an introduction to the economic buyer:**\n   - Position as: *\"I'd love to brief [CIO/CFO] on how companies like LinkedIn and NVIDIA are approaching this problem. Would that be helpful?\"*\n   - Plan a **30-minute executive summary** (not a demo) focused on ROI and risk mitigation\n\n3. **Build a stakeholder map:**\n   - Who's Sarah's boss? Does she report to CTO or CIO?\n   - Who else would touch this decision (security, IT architecture, procurement)?\n   - Who else in engineering cares about this (leads, architects)?\n\n### Next 2 Weeks\n4. **Develop a use-case-specific pitch for TechCorp:**\n   - Don't assume you know what they need \u2014 validate\n   - Once you understand pain, connect to a Glean proof point (NVIDIA, LinkedIn, Databricks for engineering/productivity themes)\n   - Build a **2-slide ROI model** showing: *current state cost \u2192 Glean implementation \u2192 annual productivity gains*\n\n5. **Run a **lightweight \"discovery POC\" if appropriate:**\n   - If the economic buyer is convinced on business case, offer a **30-day pilot** or **proof of value exercise**\n   - This helps you beat Copilot (Microsoft trials feel like \"trying software,\" Glean pilots feel like \"validating impact\")\n\n### Pipeline Forecast Note\n- **Confidence:** 30-40% win probability (too many unknowns)\n- **Best case close:** 60-90 days (IF EB gets involved this month)\n- **Likely close:** 120+ days (EB first sees deal now, evaluation takes time, procurement in Apr-May)\n- **Flag to Kara:** Do not forecast this as \"likely to close Q1.\" Best case is Q2 early (Apr-Jun).\n\n---\n\n## Glean Positioning Against Copilot (Talking Points)\n\nUse these when you're with Sarah and/or the EB:\n\n**\"Copilot is great for M365. Glean is for everything else.\"**\n- Copilot: M365-native, great for Office, email, Teams\n- Glean: 100+ connectors, works across your entire tech stack (Jira, Slack, Confluence, GitHub, Salesforce, ServiceNow, etc.)\n\n**\"The real value isn't in the AI model \u2014 it's in understanding your data.\"**\n- Copilot: Keyword search over M365 documents\n- Glean: Enterprise graph that understands relationships, context, and permissions across all your systems\n\n**\"LinkedIn chose Glean even in a Microsoft-heavy environment.\"**\n- LinkedIn engineering said Glean is \"leaps and bounds better than Copilot\" because it searches across their entire stack with better relevance\n\n**\"You don't have to choose \u2014 you can use both.\"**\n- Copilot for M365, Glean as the horizontal layer on top of everything\n- This removes the \"threat\" and makes it easier for Sarah to advocate internally\n\n---\n\n## Questions for Your Next Call with Sarah\n\nUse these to fill gaps and validate assumptions:\n\n1. *\"Walk me through what you're trying to accomplish with this evaluation. What's the business problem?\"*\n2. *\"What does your technology stack look like? Where do your teams spend time searching for information or context?\"*\n3. *\"If we implement something like this, how would you measure success? What metrics would matter to your leadership?\"*\n4. *\"Who do you think would need to sign off on a decision like this? Help me understand the approval process.\"*\n5. *\"Are you evaluating whether you *need* this capability, or are you comparing solutions?\"*\n6. *\"What's your timeline? Is there a deadline or event driving this?\"*\n7. *\"How would you describe the difference you're looking for between Copilot and something like Glean?\"*\n\n---\n\n## Deal File Recommendation\n\nOnce you've answered these MEDDPICC gaps, create an account file: `/accounts/techcorp.md`\n\nInclude:\n- Company snapshot (size, key executives, tech stack)\n- Deal summary ($200k ARR, Stage 3 Discovery, March 2026)\n- Stakeholder map (Sarah, EB name, other influencers)\n- Pain statement (validated from calls)\n- Decision process and timeline\n- Competitive positioning\n- Next actions and owners (you vs. Sarah)\n\nThis keeps everything in one place and makes it easy to brief Kara or pass to someone if needed.\n"}], "grading": {"expectations": [{"text": "Flags that no account file exists and offers to create one", "passed": false, "evidence": "The transcript mentions creating an account file only at the very end: 'When you have answers from your Sarah call, we should create a TechCorp account file at `/accounts/techcorp.md`'. This is conditional and not a proactive flag/offer upfront during the analysis."}, {"text": "Multiple MEDDPICC elements are marked Weak or Unknown given minimal info", "passed": true, "evidence": "MEDDPICC scorecard shows: Metrics \ud83d\udd34 (not quantified), Economic Buyer \ud83d\udd34 (Unknown/unmet), Decision Criteria \ud83d\udfe1 (Partially understood), Decision Process \ud83d\udd34 (Unclear), Pain \ud83d\udfe1 (Inferred, not validated), Champion \ud83d\udfe1 (Solid technical ally), Competition \ud83d\udfe1 (Clear but manageable)."}, {"text": "Economic Buyer is flagged as unknown/weak since no EB meeting has happened", "passed": true, "evidence": "Economic buyer section explicitly states: 'This is your biggest risk. Sarah is a **technical champion**, not the budget owner. You need the CIO, CFO, or COO. Get access this week.' Clearly flagged as unknown and highest risk."}, {"text": "Competition section references Microsoft Copilot and uses Glean competitive positioning", "passed": true, "evidence": "Competition section 'The Copilot Conversation' provides detailed positioning with specific competitive advantages and use cases: 'Copilot is great for M365. Glean is for everything else', 'LinkedIn story', specific connector advantages, and permission-aware messaging."}, {"text": "An HTML one-pager file is created", "passed": false, "evidence": "No HTML file in outputs directory. Without_skill outputs contain: TechCorp-MEDDPICC-Analysis.md, transcript.md. No .html file present."}, {"text": "Proactively offers to build a specific deliverable (not just a generic 'what do you want to do next')", "passed": false, "evidence": "The transcript ends with action items and questions but no proactive offer to build a specific deliverable. It says 'Once you have answers to these, you can build a real strategy' and outlines what needs to happen, but does not offer Claude to build a champion brief or other specific artifact."}], "summary": {"passed": 3, "failed": 3, "total": 6, "pass_rate": 0.5}}}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "deal-strategy", "skill_path": "/sessions/beautiful-inspiring-shannon/deal-strategy", "executor_model": "claude-opus-4-6", "timestamp": "2026-03-14T14:00:00Z", "evals_run": [1, 2, 3], "runs_per_configuration": 1}, "runs": [{"eval_id": 1, "eval_name": "Amplify Close Urgency", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 0.86, "passed": 6, "failed": 1, "total": 7, "time_seconds": 177.8, "tokens": 74908, "tool_calls": 7, "errors": 0}, "expectations": [{"text": "Analysis references specific Amplify stakeholders by name", "passed": true, "evidence": "Catherine Mackay, Rick McMorrow, Aaron Harnly, Kevin Keogan, Sarah Barnes all named with titles and roles"}, {"text": "MEDDPICC assessment covers all 7 elements with status indicators", "passed": true, "evidence": "All 7 elements with color-coded status indicators"}, {"text": "Economic Buyer flagged as gap", "passed": true, "evidence": "EB marked as Developing/borderline Weak"}, {"text": "Honest forecast recommendation", "passed": true, "evidence": "Best Case not Commit with 65-70% confidence"}, {"text": "Time-bound strategic actions", "passed": true, "evidence": "3-move play with specific dates March 14-17, 18-24, 25-31"}, {"text": "HTML one-pager created", "passed": true, "evidence": "amplify-education-deal-strategy.html exists"}, {"text": "Proactive deliverable offer", "passed": false, "evidence": "References ROI reframing as action but doesn't explicitly offer to build it"}]}, {"eval_id": 1, "eval_name": "Amplify Close Urgency", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.71, "passed": 5, "failed": 2, "total": 7, "time_seconds": 133.1, "tokens": 67442, "tool_calls": 12, "errors": 0}, "expectations": [{"text": "Analysis references specific Amplify stakeholders by name", "passed": true, "evidence": "Catherine Mackay, Rick McMorrow, Aaron Harnly, Kevin Keogan named"}, {"text": "MEDDPICC assessment covers all 7 elements with status indicators", "passed": true, "evidence": "Full 7-element scorecard with color indicators"}, {"text": "Economic Buyer flagged as gap", "passed": true, "evidence": "EB marked red, business case not submitted"}, {"text": "Honest forecast recommendation", "passed": true, "evidence": "Best Case with 40-50% probability"}, {"text": "Time-bound strategic actions", "passed": true, "evidence": "17-day action plan with specific dates"}, {"text": "HTML one-pager created", "passed": false, "evidence": "No HTML file \u2014 created .md and .txt files instead"}, {"text": "Proactive deliverable offer", "passed": false, "evidence": "No offer to build deliverable"}]}, {"eval_id": 2, "eval_name": "Forecast Call Prep", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 166.0, "tokens": 74346, "tool_calls": 12, "errors": 0}, "expectations": [{"text": "Clear Commit vs Best Case recommendation", "passed": true, "evidence": "Best Case not Commit with detailed reasoning"}, {"text": "References 17-day timeline", "passed": true, "evidence": "Specific dates: March 17 business case, March 20 approval, March 20-30 legal"}, {"text": "EB approval gap as key risk", "passed": true, "evidence": "EB marked Developing/borderline Weak, Catherine approval is gate"}, {"text": "HTML one-pager created", "passed": true, "evidence": "amplify-education-deal-strategy.html exists"}, {"text": "Proactive deliverable offer", "passed": true, "evidence": "Offers to build Champion Enablement Brief with specific components"}]}, {"eval_id": 2, "eval_name": "Forecast Call Prep", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.6, "passed": 3, "failed": 2, "total": 5, "time_seconds": 38.0, "tokens": 57074, "tool_calls": 6, "errors": 0}, "expectations": [{"text": "Clear Commit vs Best Case recommendation", "passed": true, "evidence": "Best Case not Commit with reasoning"}, {"text": "References 17-day timeline", "passed": true, "evidence": "Timeline discussed with approval/legal milestones"}, {"text": "EB approval gap as key risk", "passed": true, "evidence": "Catherine approval flagged as red flag"}, {"text": "HTML one-pager created", "passed": false, "evidence": "Only transcript.md \u2014 no HTML file"}, {"text": "Proactive deliverable offer", "passed": false, "evidence": "No offer to build anything"}]}, {"eval_id": 3, "eval_name": "New Deal Minimal Context", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 6, "failed": 0, "total": 6, "time_seconds": 184.7, "tokens": 72222, "tool_calls": 11, "errors": 0}, "expectations": [{"text": "Flags no account file and offers to create", "passed": true, "evidence": "Explicitly notes TechCorp has no account file and recommends creating one"}, {"text": "Multiple elements Weak/Unknown", "passed": true, "evidence": "3 red elements, 4 yellow elements"}, {"text": "EB flagged as unknown/weak", "passed": true, "evidence": "EB marked RED \u2014 No Access"}, {"text": "Copilot competitive positioning", "passed": true, "evidence": "Detailed Glean vs Copilot with connector breadth, enterprise graph, LinkedIn proof point"}, {"text": "HTML one-pager created", "passed": true, "evidence": "TechCorp-deal-strategy.html exists"}, {"text": "Proactive specific deliverable offer", "passed": true, "evidence": "Offers to build Champion Enablement Brief for Sarah"}]}, {"eval_id": 3, "eval_name": "New Deal Minimal Context", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.5, "passed": 3, "failed": 3, "total": 6, "time_seconds": 107.5, "tokens": 60019, "tool_calls": 7, "errors": 0}, "expectations": [{"text": "Flags no account file and offers to create", "passed": false, "evidence": "Only conditionally mentions creating account file at the end"}, {"text": "Multiple elements Weak/Unknown", "passed": true, "evidence": "Multiple red and yellow elements"}, {"text": "EB flagged as unknown/weak", "passed": true, "evidence": "EB flagged as biggest risk"}, {"text": "Copilot competitive positioning", "passed": true, "evidence": "Detailed Copilot positioning with LinkedIn story"}, {"text": "HTML one-pager created", "passed": false, "evidence": "No HTML file \u2014 only .md files"}, {"text": "Proactive specific deliverable offer", "passed": false, "evidence": "No proactive offer to build anything"}]}], "run_summary": {"with_skill": {"pass_rate": {"mean": 0.95, "stddev": 0.08, "min": 0.86, "max": 1.0}, "time_seconds": {"mean": 176.2, "stddev": 9.6, "min": 166.0, "max": 184.7}, "tokens": {"mean": 73825, "stddev": 1388, "min": 72222, "max": 74908}}, "without_skill": {"pass_rate": {"mean": 0.6, "stddev": 0.11, "min": 0.5, "max": 0.71}, "time_seconds": {"mean": 92.9, "stddev": 48.8, "min": 38.0, "max": 133.1}, "tokens": {"mean": 61512, "stddev": 5296, "min": 57074, "max": 67442}}, "delta": {"pass_rate": "+0.35", "time_seconds": "+83.3", "tokens": "+12313"}}, "notes": ["Skill consistently produces HTML one-pagers (3/3) while baseline never does (0/3) \u2014 this is the strongest differentiator", "Proactive deliverable offers pass in 2/3 with-skill runs vs 0/3 without \u2014 Eval 1 with-skill missed this, suggesting the skill instructions could be more explicit", "MEDDPICC analysis quality is similar between skill and baseline \u2014 both correctly identify gaps and stakeholders", "Skill runs take ~2x longer (176s vs 93s avg) but produce significantly more structured, actionable output", "Eval 2 without-skill was notably fast (38s) but produced only a transcript with no formatted deliverable"]}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

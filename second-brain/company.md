@@ -6,70 +6,124 @@
 
 ## What Glean Does
 
-Glean is the Work AI platform that connects and understands all of a company's data so employees can find, create, and automate work with AI.
+Glean is the work AI platform and enterprise context layer that connects to 100+ apps (Slack, Salesforce, Confluence, Google Drive, Jira, etc.) and understands how your company actually works. It builds a rich knowledge graph over all that content and activity, then uses it to power a personal AI assistant and agents that can search, reason, and take action across your stack — always respecting permissions. Instead of point solutions in each tool, Glean becomes the horizontal layer every assistant and agent can rely on for trusted, up-to-date context.
 
-**One-liners (pick the right one for the audience):**
+**One-line pitch:**
+> "Glean is the AI context layer that lets every employee search, ask, and delegate work to agents across everything your company knows."
+
+**Additional one-liners (pick the right one for the audience):**
 - "Work AI platform that connects and understands all of a company's data to generate answers and automate work."
 - "Secure, permission-aware AI assistant and agents that work across 100+ apps — search, chat, actions, agents — with one enterprise graph underneath."
 - "Work assistant for your company, not just your suite — horizontal across systems, model-agnostic, lives where employees already work."
 - "Like the one person at your company who seems to know everything — except it's always available, understands your content, and can answer complex questions in seconds."
 - "Glean turns fragmented systems — Slack, email, Jira, Salesforce, Confluence, OneDrive, and more — into a single, permission-aware enterprise brain that powers search, assistant, and agents."
 
-**The key differentiator in one sentence:**
-Glean has a deep knowledge graph that connects all of the data your employees touch, understanding context and permissions across every system — not just vector search over a few sources.
+---
+
+## Mission & Values
+
+**Mission:** Expand human potential to do extraordinary work.
+
+**Core Values:**
+- **Make it customer-driven** — Solve real pain points, deliver an amazing customer experience, and build long-term partnerships with customers.
+- **Make it happen** — Be dependable and gritty, with a strong bias to action and ownership in the face of ambiguity.
+- **Make it better** — Act like an owner, continuously improve the product and company, question the status quo, and normalize giving and receiving feedback.
+- **Make it together** — Work with high integrity, be transparent, trust and respect each other, and support your teammates through the ups and downs.
 
 ---
 
-## Core Angles vs. the Competition
+## Ideal Customer Profile (ICP)
 
-- **Depth of connectors + permissions** across SaaS and internal systems — not just a first-party suite
-- **Enterprise graph and relevance** — not just vector search; Glean understands relationships between content, people, and context
-- **True horizontal Work AI layer** — search + assistant + agents that sit on top of any model and cloud, no vendor lock-in
-- **Permission-aware by design** — users only ever see what they're already allowed to see; security is built in, not bolted on
+**Company size:**
+- 500–10,000+ employees
+- Multi-team, multi-region, with meaningful knowledge/IT complexity
+
+**Industries:**
+- Tech & SaaS
+- Financial Services & Insurance
+- Healthcare & Life Sciences
+- Professional Services & Consulting (law, consulting, PE/VC)
+- Complex B2B / multi-product enterprises (manufacturing, telco, retail, logistics)
+
+**Tech stack signals:**
+- Heavy Google Workspace or Microsoft 365
+- Slack or Microsoft Teams as primary communication layer
+- Confluence / Notion / SharePoint + shared drives for docs and wikis
+- Salesforce, Jira, Zendesk/ServiceNow, Workday, code repos (GitHub/GitLab), major warehouses (Snowflake, BigQuery, Databricks)
+- Already piloting Copilot / ChatGPT Enterprise / Gemini / Claude but lacking an enterprise context layer
+
+**Primary buyers and champions:**
+- Economic buyer: CIO, CDO, Head of Digital / Transformation, sometimes CFO
+- Champions: Head of IT / Workplace Productivity / Enterprise Apps; Head of Engineering / Dev Productivity; Head of Support / CX / Success; Sales Ops / RevOps when GTM use cases lead
+- Influencers: Security, Compliance, HR/People Ops (for change management)
+
+**Pain signals:**
+- Employees complain they "can't find anything" or constantly ask in Slack/Teams
+- Duplicated work and knowledge silos across tools and business units
+- Slow onboarding/ramp for new hires, engineers, or support reps
+- Internal support (IT/HR/ops) swamped by repetitive how-to questions
+- Leadership pressure to "make AI real" (beyond chatbots or one-off POCs)
+- Fragmented search (multiple portals, intranet, wiki, copilot, etc.) and no single, trusted source of truth
+
+**Buying triggers:**
+- New CIO/CDO/CTO or Head of AI/Transformation with a mandate to modernize knowledge and AI
+- Formal AI, digital workplace, or "Future of Work" initiative kicked off
+- M&A, re-orgs, or tool consolidation causing confusion across systems
+- Rapid headcount growth or global expansion (new regions, new business units)
+- Major SaaS renewals (e.g., Microsoft E5, Google Workspace, Salesforce) prompting a stack rethink
+
+**Security & deployment fit:**
+- Comfortable with modern SaaS but demanding strong permissions, auditing, and compliance
+- Mix of SaaS + cloud data platforms (AWS/GCP/Azure) where context and governance matter
+- Interest in LLM choice (OpenAI, Anthropic, Gemini, Bedrock, etc.) vs. being locked into one vendor
+
+**Cultural / change-readiness signals:**
+- Leadership talks about knowledge sharing, developer productivity, or employee experience as strategic
+- Already experimenting with AI in pockets of the business, but want a horizontal, governed platform
+- Willing to invest in rollout, enablement, and adoption (vs. "flip a switch and hope")
+
+**Lower-priority / poor fit:**
+- Few native systems, minimal knowledge fragmentation
+- Heavily on-prem / legacy only, unwilling to adopt modern SaaS or centralize identity and permissions
+- "Toy" AI projects with no executive sponsor, no budget, and no clear business outcomes
 
 ---
 
-## Competitive Landscape — Northeast Enterprise
+## Economic Buyers
 
-### Primary "Platform" Competitors
-
-| Competitor | How We Win | Watch Out For |
-|------------|------------|---------------|
-| **Microsoft 365 Copilot** | Connector breadth (100+ vs. M365-only), stronger search relevance, enterprise graph, works in non-Microsoft shops | Bundling / price pressure; "we already pay for it" objection |
-| **Google Agentspace / Gemini Enterprise** | Same as above for Google shops — Glean is horizontal, not tied to one cloud | Google-first environments |
-| **Amazon Q Business** | Stronger connectors, better UX, more proven enterprise logos | AWS-heavy shops |
-
-### Common Departmental / Point Competitors
-
-| Competitor | Context |
-|------------|---------|
-| Slack AI, Notion AI | Single-app AI — Glean is cross-system |
-| ServiceNow Virtual Agent, Salesforce Agentforce / Einstein | Vertical ITSM/CRM tools — Glean is the horizontal layer |
-| Moveworks | ITSM-focused; Glean is broader (search + assistant + agents across all depts) |
-| Coveo, Guru | Enterprise search / knowledge mgmt — Glean's graph and AI are stronger |
-| Legacy enterprise search / intranets | Usually point to time-to-value and modern AI capabilities |
+- **CIO** — when the mandate is enterprise-wide AI, information access, and system-of-record strategy. Always involved as part of the process and requires sign-off, if not driving the initiative.
+- **CTO** — when Glean is part of the core AI / engineering / developer productivity strategy. Always involved for technical validation and long-term architecture fit, if not driving the initiative.
+- **CFO** — when the business case is framed around hard cost savings, AI/LLM spend control, or tool consolidation. Almost always involved for budget approval and ROI scrutiny.
+- **Chief Digital Officer / Chief Data Officer (CDO)** — when Glean underpins a broader data/digital or "AI foundation" strategy.
+- **Chief Customer Officer / SVP Customer Support or CX** — when the primary value is support deflection, faster resolution, or better CX.
+- **CRO / Head of Sales / RevOps** — when the entry point is sales productivity, pipeline velocity, or account intelligence.
+- **Chief Product Officer / Head of Product** — when Glean is positioned as a core platform for PMs/Eng (product discovery, roadmap, feedback).
+- **Chief Transformation Officer** — when there's a formal transformation office owning cross-functional AI and change-management budget.
 
 ---
 
-## Where I'm Seeing the Most Traction (Northeast)
+## Value Propositions
 
-### Financial Services (Buy Side — Hedge Funds, AM, PE)
-**Key logos:** Millennium, GCM Grosvenor, Shore Capital, Wealthsimple
-**Themes:** Investment research, DDQ/RFP automation, risk and compliance, client reporting, IR, "one brain" across funds and strategies
-**Pattern:** Analysts and PMs sit on decades of fragmented research, models, K-1/K-3 docs, and LP reporting across email, file shares, and knowledge bases. Glean connects it all — turning multi-day research spikes into seconds and letting teams answer LP questions from 40+ years of documentation.
+**1. Work AI that actually understands your business**
+Built on Glean's Enterprise Graph and knowledge graph, so answers are grounded in your company's real content, people, and workflows — not generic internet training data. Uses hybrid search + RAG over your apps, so responses cite sources, handle nuance, and adapt to your org's language and structure.
 
-### Media, Publishing & Information Services
-**Key logos:** The New York Times, TIME
-**Themes:** Archive search, research workflows, editorial prep, ad/sales enablement
-**Pattern:** TIME uses Glean to make a century of archives instantly searchable — turning historical content into live selling and editorial assets. This maps directly to any NYT-scale environment: decades of content, complex rights, multiple CMSs, and a mix of editorial, commercial, and research users.
+**2. Measurable productivity and business impact**
+Employees spend hours every week searching, re-creating work, or asking the same questions; Glean turns that into seconds. Quantifiable ROI: `X min saved per employee per day × headcount × fully loaded cost/hour` — plus faster onboarding, shorter ticket resolution, faster sales cycles, and fewer internal support requests.
 
-### Large B2B SaaS / Cloud Infrastructure
-**Key logos:** LinkedIn, Databricks, MongoDB, Confluent, Uber, NVIDIA
-**Themes:** Engineering productivity, GTM enablement, support/ITSM, internal AI platform, "one AI layer" across messy SaaS estates
-**Pattern:** NVIDIA tried to build this internally, discovered the connector/permissions/relevance problem at scale is a multi-year platform problem, and chose Glean instead. LinkedIn engineering described Glean as "leaps and bounds better than anything Copilot can do."
+**3. Secure, permission-aware by design**
+Always-on permission model: every answer and search result respects the underlying source system's ACLs — no "AI side doors." Enterprise-grade security and compliance (SOC 2, GDPR, SSO, SCIM, data residency options), with Glean Protect for DLP, sensitive content controls, and AI safety.
 
-### Enterprise Tech + High-Growth Commercial
-**Themes:** GTM (sales, CS, marketing), support/ITSM, engineering onboarding, "one AI layer"
+**4. One horizontal AI layer across all your tools**
+100+ native connectors across content, comms, code, CRM, support, HR, and data platforms — minimal IT lift to get started. Works where employees already are: Slack/Teams, browser extension, Salesforce, ServiceNow/Zendesk, Zoom/Webex, desktop, and more.
+
+**5. Agents that go beyond chat to automate real work**
+Ready-made and custom AI agents that can plan, reason, and take action (not just summarize) across your stack — e.g., account 360, ticket triage, engineering onboarding, QBR prep. Visual Agent Builder + natural language "draft with AI," so teams can create governed agents without writing code.
+
+**6. Fast time to value**
+Typical customers see meaningful end-user value in weeks, not quarters — often within the first 30 days of rollout. Turnkey deployment playbook: connect priority sources, light-touch admin setup, then targeted department pilots (e.g., Support, Eng, Sales) to prove value quickly.
+
+**7. Open, future-proof AI platform**
+Model-agnostic: plug in OpenAI, Anthropic, Gemini, Bedrock, etc., and mix models by use case — without rebuilding your stack. Rich APIs, SDKs, and MCP support so you can bring Glean's context into other assistants and tools, or call external tools from Glean Agents. Index data and set governance once, then reuse that trusted context across every present and future AI experience.
 
 ---
 
@@ -117,19 +171,41 @@ Glean has a deep knowledge graph that connects all of the data your employees to
 
 ---
 
-## Buyer Personas
+## Competitive Landscape — Northeast Enterprise
 
-**Primary Economic Buyer:**
-- CIO / Head of IT / Head of Technology / Head of AI — owns "Work AI platform," digital workplace, and AI governance
+### Primary "Platform" Competitors
 
-**Strong Co-Buyers / Champions:**
-- Head of Support / ITSM leader — ticket deflection, AHT/MTTR, CSAT
-- VP Engineering / Head of Developer Productivity — dev velocity, incident MTTR, on-call
-- CRO / Head of Sales / VP Enablement — rep productivity, ramp, win rate
-- COO / Head of Ops — cross-functional process efficiency
+| Competitor | How We Win | Watch Out For |
+|------------|------------|---------------|
+| **Microsoft Copilot** | Breadth of connectors, works outside M365, true horizontal context and agents across all apps | Bundling / E5 pressure, "included" narrative |
+| **ChatGPT / GPT Enterprise** | Deep, permission-aware enterprise context; 100+ connectors; governed search + agents, not just chat over uploads | Strong brand, dev love, "we already bought OpenAI" budget |
+| **Google Agentspace / Gemini Enterprise** | Same horizontal story — Glean is not tied to one cloud | Google-first environments |
+| **Guru** | Stronger AI, real-time search across systems vs. curated wikis | SMB / price sensitivity |
+| **Notion AI** | Enterprise scale, security, breadth of sources and surfaces | Design-forward buyers / Notion-centric teams |
+| **Glean vs. Status Quo** | Any quantifiable time savings, better answers, and reduced internal tickets win | "Good enough" inertia, homegrown experiments |
 
-**What they care about most:**
-Measurable productivity and capacity gains, support and ITSM metrics (deflection, MTTR, AHT), engineering efficiency, GTM revenue outcomes — with strong security and no hyperscaler lock-in.
+### Common Departmental / Point Competitors
+
+| Competitor | Context |
+|------------|---------|
+| Slack AI, Notion AI | Single-app AI — Glean is cross-system |
+| ServiceNow Virtual Agent, Salesforce Agentforce / Einstein | Vertical ITSM/CRM tools — Glean is the horizontal layer |
+| Moveworks | ITSM-focused; Glean is broader (search + assistant + agents across all depts) |
+| Coveo, Guru | Enterprise search / knowledge mgmt — Glean's graph and AI are stronger |
+| Legacy enterprise search / intranets | Point to time-to-value and modern AI capabilities |
+
+---
+
+## Common Objections & Responses
+
+| Objection | Response |
+|-----------|----------|
+| "We already have Microsoft Copilot." | Totally compatible. Copilot is great inside M365; Glean is the horizontal context + search + agents layer across *all* your tools (Salesforce, Jira, Slack, Confluence, code, data warehouses, etc.). Most customers run Glean and Copilot together: Copilot for in-app productivity, Glean for cross-system answers and governed enterprise context. |
+| "We built something internal." | Awesome — that usually proves the problem is real. What we see is internal tools struggle to keep up with connectors, permissions, ranking, and AI quality at scale. Glean ships and maintains 100+ connectors, hybrid search, an enterprise knowledge graph, AI evals, and agent orchestration out of the box, plus security, SLAs, and roadmap investment your team doesn't have to fund or maintain. And importantly — you can build on top of Glean. Glean's APIs let you bring Glean's contextual knowledge, permissioning, and connector ecosystem directly into your internal tools. You don't have to choose between building and buying. |
+| "It's too expensive." | We typically pay for ourselves quickly. Even 10–15 minutes saved per employee per day × fully loaded hourly cost × headcount dwarfs a Glean subscription, before you factor in faster onboarding, fewer internal tickets, shorter sales cycles, and less duplicated work. We can model this with your numbers so finance sees the ROI. |
+| "We're not ready for AI." | Glean is actually how customers get ready for AI. You can start with "just better search" (no prompt engineering, no custom models), then turn on assistant and agents once you're comfortable. Because everything is permissions-aware and fully cited, it's a low-risk way to introduce AI while keeping control over data, models, and governance. |
+| "Our employees won't use it." | Adoption is highest when AI meets people where they already work. Glean shows up in Slack/Teams, the browser, Salesforce, ServiceNow/Zendesk, GitHub, desktop, and web, so it feels like part of the flow, not another portal. Customers routinely see >70–80% seat utilization when we pair a strong champion, 1–2 departmental use cases, and light enablement. |
+| "What about our data security?" | Glean is built for security-sensitive enterprises. It never changes source permissions, enforces ACLs on every query, and never trains foundation models on your data. Single-tenant options, audit logs, SSO/SCIM, SOC 2, GDPR, and DLP/sensitive content controls via Glean Protect are all part of the platform. We can map this directly to your security and compliance requirements. |
 
 ---
 
@@ -157,16 +233,32 @@ TIME uses Glean to make a century of archives instantly searchable, turning hist
 
 ---
 
-## Common Objections & Responses
+## Where I'm Seeing the Most Traction (Northeast)
 
-| Objection | Response |
-|-----------|----------|
-| "We already have Microsoft Copilot" | Glean works alongside Microsoft — it searches across all your apps, not just M365. LinkedIn engineering uses both and called Glean "leaps and bounds better." |
-| "We'll build it internally" | NVIDIA tried this with a dedicated team. The connector, permissions, and relevance problem at scale is a multi-year platform build. They chose Glean instead. And importantly — you can build on top of Glean. Glean's APIs let you bring Glean's contextual knowledge, permissioning, and connector ecosystem directly into your internal tools. You don't have to choose between building and buying — Glean becomes the platform your internal builds run on. |
-| "It's too expensive" | Use the appropriate ROI sound bite — T-Mobile ($20M+), Duolingo (5x ROI), Wealthsimple ($1M+) — then build a custom model with their headcount and loaded cost. |
-| "We're not ready for AI" | Glean is the lowest-risk AI investment — no prompt engineering, no model risk, no data training. Just better search and answers from your existing systems. |
-| "What about our data security?" | Glean is permissions-aware by design — users only see what they're already allowed to see. SOC2, enterprise-grade, no training on your data. |
-| "We have Google / we use Workspace" | Same story as Microsoft — Glean is horizontal, Google Agentspace is limited to Google's stack. |
+### Financial Services (Buy Side — Hedge Funds, AM, PE)
+**Key logos:** Millennium, GCM Grosvenor, Shore Capital, Wealthsimple
+**Themes:** Investment research, DDQ/RFP automation, risk and compliance, client reporting, IR, "one brain" across funds and strategies
+
+### Media, Publishing & Information Services
+**Key logos:** The New York Times, TIME
+**Themes:** Archive search, research workflows, editorial prep, ad/sales enablement
+
+### Large B2B SaaS / Cloud Infrastructure
+**Key logos:** LinkedIn, Databricks, MongoDB, Confluent, Uber, NVIDIA
+**Themes:** Engineering productivity, GTM enablement, support/ITSM, internal AI platform
+
+### Enterprise Tech + High-Growth Commercial
+**Themes:** GTM (sales, CS, marketing), support/ITSM, engineering onboarding, "one AI layer"
+
+---
+
+## Glean's Current Strategic Priorities
+
+1. **Be the enterprise context layer for AI** — Deepen the Enterprise Graph and hybrid search so every assistant, agent, and workflow in the company can rely on Glean for accurate, permission-aware context across all apps.
+2. **Make AI mission-critical for everyday work** — Evolve Glean Assistant and Glean Agents from "nice-to-have chat" into the default way engineers, support teams, sales, and others find answers, create content, and automate multi-step workflows.
+3. **Deliver the fastest, safest time to value** — Keep deployments turnkey (weeks, not quarters), while strengthening security, permissions, and governance so CIOs/CISOs can confidently scale AI across the enterprise.
+4. **Empower builders with an open platform** — Invest in APIs, SDKs, MCP, and no-code builder experiences so internal teams can create their own agents, apps, and integrations on top of Glean's context layer — without reinventing search, security, or connectors.
+5. **Prove tangible business outcomes, not just productivity** — Tie Glean to hard metrics — ticket deflection, engineering throughput, sales velocity, onboarding time — so customers see Glean as a revenue, cost, and risk lever, not just a knowledge tool.
 
 ---
 
